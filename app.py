@@ -1,6 +1,8 @@
 import heapq
 import itertools
 import io
+import json
+import os
 import re
 from datetime import date, datetime, timedelta
 
@@ -283,8 +285,42 @@ def task_frame(tasks):
     return frame
 
 today = date.today()
+DATA_FILE = "studypilot_data.json"
+
+def save_tasks():
+    """Persist the current task list so it survives a browser reload on the same app instance."""
+    try:
+        serializable = []
+        for task in st.session_state.get("tasks", []):
+            item = dict(task)
+            exam_day = item.get("Exam date", today)
+            if isinstance(exam_day, (date, datetime)):
+                item["Exam date"] = exam_day.isoformat()
+            serializable.append(item)
+        with open(DATA_FILE, "w", encoding="utf-8") as data_file:
+            json.dump(serializable, data_file, ensure_ascii=False, indent=2)
+    except (OSError, TypeError, ValueError):
+        # Keep the planner usable even if the hosting environment is read-only.
+        pass
+
+def load_tasks():
+    """Load saved tasks, falling back to demo data for a first-time visitor."""
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r", encoding="utf-8") as data_file:
+                saved = json.load(data_file)
+            if isinstance(saved, list):
+                for item in saved:
+                    if item.get("Exam date"):
+                        item["Exam date"] = pd.to_datetime(item["Exam date"]).date()
+                    item.setdefault("Status", "Pending")
+                return saved
+    except (OSError, json.JSONDecodeError, TypeError, ValueError):
+        pass
+    return demo_tasks(today)
+
 if "tasks" not in st.session_state:
-    st.session_state.tasks = demo_tasks(today)
+    st.session_state.tasks = load_tasks()
 if "generated" not in st.session_state:
     st.session_state.generated = False
 
@@ -421,10 +457,12 @@ with st.sidebar:
     st.divider()
     if st.button("Restore demo tasks", use_container_width=True):
         st.session_state.tasks = demo_tasks(date.today())
+        save_tasks()
         st.session_state.generated = False
         st.rerun()
     if st.button("Clear all tasks", use_container_width=True):
         st.session_state.tasks = []
+        save_tasks()
         st.session_state.generated = False
         st.rerun()
     st.caption("Demo data is included so you can present the project immediately.")
@@ -506,11 +544,13 @@ with tasks_tab:
                 st.session_state.tasks.append({"Subject":subject.strip(), "Task":task_name.strip(),
                     "Exam date":due_date, "Hours":float(hours), "Difficulty":difficulty, "Importance":importance,
                     "Status":"Pending", "Notes":notes.strip()})
+                save_tasks()
                 st.session_state.generated = False
                 st.rerun()
     if st.session_state.tasks:
-        st.markdown("### Tick off completed topics")
-        st.caption("Check a topic when you finish it. Completed topics are removed from the pending workload and future generated plans.")
+        st.markdown("### Mark topics as completed")
+        st.info("Use the checkboxes below to mark each topic done. Your task list and completion status are saved when you change them, so they remain after a browser reload on the same app instance.")
+        st.caption("Completed topics are removed from the pending workload and future generated plans.")
         status_changed = False
         task_columns = st.columns(2)
         for task_index, task_item in enumerate(st.session_state.tasks):
@@ -530,6 +570,7 @@ with tasks_tab:
                 st.session_state.tasks[task_index]["Status"] = "Completed" if checked else "Pending"
                 status_changed = True
         if status_changed:
+            save_tasks()
             st.session_state.generated = False
             st.rerun()
 
@@ -546,6 +587,7 @@ with tasks_tab:
         if st.button("Save task changes", type="primary"):
             edited["Exam date"] = pd.to_datetime(edited["Exam date"]).dt.date
             st.session_state.tasks = edited.fillna("").to_dict("records")
+            save_tasks()
             st.session_state.generated = False
             st.rerun()
     else:
@@ -614,6 +656,7 @@ with syllabus_tab:
                     "Notes":"Extracted from " + st.session_state.get("handout_filename", "course handout")})
                 existing.add(key)
                 added += 1
+            save_tasks()
             st.session_state.generated = False
             st.success("Added " + str(added) + " topic tasks to your planner. Open Study plan and generate your schedule.")
     elif st.session_state.get("handout_text_preview"):
