@@ -261,6 +261,48 @@ if upcoming_exams:
 else:
     st.info("Add an exam date to see your countdown cards here.")
 
+
+# Always-visible subject launcher: the five subjects requested for the student dashboard.
+dashboard_subjects = [
+    ("Artificial Intelligence and Cloud Computing", "AI concepts, search methods and cloud fundamentals", ["artificial intelligence", "cloud computing"]),
+    ("Computer Networks", "Networking concepts, protocols and subnetting", ["computer networks"]),
+    ("Software Engineering", "Requirements, design, testing and process models", ["software engineering"]),
+    ("Game Theory", "Strategies, game trees and decision-making", ["game theory"]),
+    ("Predictive Analysis", "Prediction, modelling and analytical methods", ["predictive analysis", "predictive analytics"]),
+]
+st.markdown("""
+<div class="section-heading">
+  <div>
+    <div class="section-eyebrow">YOUR SUBJECTS</div>
+    <h2 style="margin:0">What do you want to study?</h2>
+  </div>
+  <div class="section-caption">Choose a subject to see your progress</div>
+</div>
+""", unsafe_allow_html=True)
+subject_rows = [st.columns(3), st.columns(2)]
+for index, (subject_name, subject_desc, aliases) in enumerate(dashboard_subjects):
+    col = subject_rows[0][index] if index < 3 else subject_rows[1][index - 3]
+    related = []
+    for task_item in st.session_state.tasks:
+        current_subject = str(task_item.get("Subject", "")).lower()
+        if any(alias in current_subject for alias in aliases):
+            related.append(task_item)
+    open_count = sum(1 for task_item in related if task_item.get("Status", "Pending") != "Completed")
+    done_count = sum(1 for task_item in related if task_item.get("Status") == "Completed")
+    with col:
+        st.markdown(f"**{index + 1:02d}  {subject_name}**")
+        st.caption(subject_desc)
+        st.markdown(f"**{open_count}** tasks left · **{done_count}** completed")
+        if st.button("Plan this subject", key=f"subject_launch_{index}", use_container_width=True):
+            st.session_state.chosen_dashboard_subject = subject_name
+            st.session_state["subject_option"] = subject_name
+            st.session_state["handout_subject_prefill"] = subject_name
+            st.session_state["show_subject_plan_hint"] = True
+            st.rerun()
+        st.divider()
+if st.session_state.get("show_subject_plan_hint"):
+    st.info("Selected: " + st.session_state.get("chosen_dashboard_subject", "") + ". Open **Build from handout** to upload its course handout and generate a topic-based plan.")
+
 with st.sidebar:
     st.markdown("## StudyPilot")
     st.caption("A focused workspace for exam preparation.")
@@ -375,7 +417,10 @@ with syllabus_tab:
     st.markdown("## Build a study plan from your course handout")
     st.caption("Choose a subject and upload the syllabus. StudyPilot extracts topics for you to review before adding them to your plan.")
     with st.form("handout_setup"):
-        subject_option = st.selectbox("Choose subject", ["Artificial Intelligence and Soft Computing", "Artificial Intelligence", "Computer Networks", "Predictive Analytics", "Software Engineering", "Cloud Computing", "Other / custom subject"])
+        subject_options = ["Artificial Intelligence and Cloud Computing", "Computer Networks", "Software Engineering", "Game Theory", "Predictive Analysis", "Other / custom subject"]
+        default_subject = st.session_state.get("handout_subject_prefill", "Artificial Intelligence and Cloud Computing")
+        default_index = subject_options.index(default_subject) if default_subject in subject_options else 0
+        subject_option = st.selectbox("Choose subject", subject_options, index=default_index, key="subject_option")
         custom_subject = st.text_input("Enter subject name", placeholder="Type your subject here") if subject_option == "Other / custom subject" else ""
         subject_choice = custom_subject.strip() if subject_option == "Other / custom subject" else subject_option
         handout = st.file_uploader("Upload course handout", type=["pdf", "docx", "txt"], help="PDF, Word document (.docx), or plain text.")
