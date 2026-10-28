@@ -1,6 +1,6 @@
 # StudyPilot — Heuristic-Based Intelligent Study Planner
 
-StudyPilot is a cloud-deployable study-planning application for an Artificial Intelligence and Cloud Computing course project. It ranks study tasks using **Greedy Best-First Search** and a transparent heuristic.
+StudyPilot is a cloud-deployable study-planning application for the Artificial Intelligence and Soft Computing (CSE3121) course. Its core AI approach is Greedy Best-First Search, which is listed under Heuristic Search Techniques in the July–November 2026 course handout. It ranks study tasks using **Greedy Best-First Search** and a transparent heuristic.
 
 ## Features
 
@@ -66,6 +66,6 @@ Streamlit Community Cloud hosts the web interface and runs the Python algorithm 
 ## Project summary
 
 - **Title:** Cloud-Deployed Intelligent Study Planner Using Heuristic Best-First Search
-- **Subject:** Artificial Intelligence and Cloud Computing
+- **Subject:** Artificial Intelligence and Soft Computing (CSE3121)
 - **Algorithm:** Greedy Best-First Search with a custom heuristic
 - **Technology:** Python, Streamlit, Pandas, Streamlit Community Cloud
