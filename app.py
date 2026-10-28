@@ -501,6 +501,30 @@ with tasks_tab:
                 st.session_state.generated = False
                 st.rerun()
     if st.session_state.tasks:
+        st.markdown("### Tick off completed topics")
+        st.caption("Check a topic when you finish it. Completed topics are removed from the pending workload and future generated plans.")
+        status_changed = False
+        task_columns = st.columns(2)
+        for task_index, task_item in enumerate(st.session_state.tasks):
+            task_subject = str(task_item.get("Subject", "Subject"))
+            task_title = str(task_item.get("Task", "Study topic"))
+            is_completed = task_item.get("Status", "Pending") == "Completed"
+            checkbox_key = f"topic_done_{task_index}_{abs(hash(task_subject + task_title)) % 10000000}"
+            with task_columns[task_index % 2]:
+                checked = st.checkbox(
+                    f"{task_title}",
+                    value=is_completed,
+                    key=checkbox_key,
+                    help=f"{task_subject} · {task_item.get('Hours', 0)} estimated hours"
+                )
+                st.caption(f"{task_subject} · {task_item.get('Importance', 'Normal')} priority")
+            if checked != is_completed:
+                st.session_state.tasks[task_index]["Status"] = "Completed" if checked else "Pending"
+                status_changed = True
+        if status_changed:
+            st.session_state.generated = False
+            st.rerun()
+
         st.markdown("### Existing tasks")
         edited = st.data_editor(task_frame(st.session_state.tasks), use_container_width=True, hide_index=True,
             num_rows="dynamic", key="tasks_editor",
