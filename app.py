@@ -510,20 +510,22 @@ if st.session_state.get("active_progress_subject"):
             current_done = task_item.get("Status", "Pending") == "Completed"
             subject_key = f"subject_progress_done_{task_index}"
             schedule_key = f"topic_schedule_done_{task_index}"
-            if subject_key not in st.session_state or st.session_state[subject_key] != current_done:
+            if subject_key not in st.session_state:
                 st.session_state[subject_key] = current_done
+            def update_subject_topic_status(index=task_index, subject_widget_key=subject_key,
+                                            schedule_widget_key=schedule_key):
+                new_status = bool(st.session_state.get(subject_widget_key, False))
+                st.session_state.tasks[index]["Status"] = "Completed" if new_status else "Pending"
+                st.session_state[schedule_widget_key] = new_status
+                save_tasks()
+                st.session_state.generated = False
             done = st.checkbox(
                 str(task_item.get("Task", "Study topic")),
                 key=subject_key,
+                on_change=update_subject_topic_status,
                 help=f'{task_item.get("Hours", 0)} estimated study hours'
             )
             st.caption(f'{task_item.get("Hours", 0)} study hours · {"Completed" if done else "Pending"}')
-            if done != current_done:
-                st.session_state.tasks[task_index]["Status"] = "Completed" if done else "Pending"
-                st.session_state[schedule_key] = done
-                save_tasks()
-                st.session_state.generated = False
-                st.rerun()
     if st.button("Close subject progress", key="close_subject_progress"):
         st.session_state.active_progress_subject = None
         st.rerun()
@@ -574,23 +576,25 @@ if st.session_state.get("show_topic_schedule", False):
                 current_done = task_item.get("Status", "Pending") == "Completed"
                 schedule_key = f"topic_schedule_done_{task_index}"
                 subject_key = f"subject_progress_done_{task_index}"
-                if schedule_key not in st.session_state or st.session_state[schedule_key] != current_done:
+                if schedule_key not in st.session_state:
                     st.session_state[schedule_key] = current_done
+                def update_topic_status(index=task_index, schedule_widget_key=schedule_key,
+                                        subject_widget_key=subject_key):
+                    new_status = bool(st.session_state.get(schedule_widget_key, False))
+                    st.session_state.tasks[index]["Status"] = "Completed" if new_status else "Pending"
+                    st.session_state[subject_widget_key] = new_status
+                    save_tasks()
+                    st.session_state.generated = False
                 done = st.checkbox(
                     f'{planned_topic["Start"]}–{planned_topic["End"]} · {planned_topic["Study task"]}',
                     key=schedule_key,
+                    on_change=update_topic_status,
                     help=f'{planned_topic["Subject"]} · {planned_topic["Hours"]:g} hours'
                 )
                 st.caption(
                     f'{planned_topic["Subject"]} · {planned_topic["Hours"]:g} hours · '
                     f'Exam: {pd.to_datetime(planned_topic["Exam date"]).strftime("%d %b %Y")}'
                 )
-                if done != current_done:
-                    st.session_state.tasks[task_index]["Status"] = "Completed" if done else "Pending"
-                    st.session_state[subject_key] = done
-                    save_tasks()
-                    st.session_state.generated = False
-                    st.rerun()
         completed_topics = [task for task in st.session_state.tasks if task.get("Status") == "Completed"]
         if completed_topics:
             st.markdown("### Already completed")
