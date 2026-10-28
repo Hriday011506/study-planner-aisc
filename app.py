@@ -432,8 +432,8 @@ with st.sidebar:
 plan_tab, tasks_tab, syllabus_tab, algorithm_tab = st.tabs(["Study plan", "Manage tasks", "Build from handout", "Algorithm"])
 
 with plan_tab:
-    st.markdown("## Today's game plan")
-    st.caption("A balanced mix of subjects each day, prioritised by exam date, difficulty, importance, and remaining workload.")
+    st.markdown("## Your complete study plan")
+    st.caption("One combined timetable for every subject you have added — balanced by exam date, difficulty, importance, and remaining workload.")
     controls = st.columns([1, 2])
     with controls[0]:
         if st.button("Generate study plan", type="primary", use_container_width=True):
@@ -447,9 +447,17 @@ with plan_tab:
         st.warning("No pending tasks. Add a task in Manage tasks or restore the demo tasks.")
     else:
         schedule_df = pd.DataFrame(sessions)
-        schedule_df = schedule_df[pd.to_datetime(schedule_df["Date"]) <= pd.Timestamp(today + timedelta(days=horizon - 1))]
+        schedule_df["Date"] = pd.to_datetime(schedule_df["Date"]).dt.date
+        # Keep every scheduled session visible so the timetable covers all subjects and the full workload.
         if st.session_state.generated:
-            st.success(f"Plan generated successfully · {len(schedule_df)} session blocks shown.")
+            subject_count = schedule_df["Subject"].nunique()
+            planned_days = schedule_df["Date"].nunique()
+            total_hours = schedule_df["Hours"].sum()
+            summary_cols = st.columns(3)
+            summary_cols[0].metric("Subjects in this plan", subject_count)
+            summary_cols[1].metric("Study sessions", len(schedule_df))
+            summary_cols[2].metric("Total scheduled hours", f"{total_hours:.1f} h")
+            st.success(f"Complete combined plan generated · {subject_count} subjects across {planned_days} study days.")
         if schedule_df.empty:
             st.info("No study sessions fall within this date range. Increase Days to show.")
         else:
