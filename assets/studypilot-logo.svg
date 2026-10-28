@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="300" viewBox="0 0 920 300" role="img" aria-labelledby="title desc">
+<title id="title">StudyPilot</title><desc id="desc">An open book with an upward navigation arrow, followed by the StudyPilot wordmark.</desc>
+<defs>
+  <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#438BFF"/><stop offset=".55" stop-color="#485BC4"/><stop offset="1" stop-color="#7B4FE2"/></linearGradient>
+  <linearGradient id="page" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#DCE7FF"/><stop offset="1" stop-color="#F4F6FF"/></linearGradient>
+</defs>
+<g transform="translate(20 22)">
+  <circle cx="124" cy="126" r="111" fill="#F0F3FF"/>
+  <circle cx="124" cy="126" r="94" fill="#E5EBFF"/>
+  <path d="M124 232 C96 207 57 190 19 190 L19 110 C62 109 98 128 124 153 Z" fill="url(#page)" stroke="#D3DDF9" stroke-width="2"/>
+  <path d="M124 232 C153 207 191 190 229 190 L229 110 C186 109 150 128 124 153 Z" fill="#FFFFFF" stroke="#D3DDF9" stroke-width="2"/>
+  <path d="M124 231 C96 206 61 194 27 195 L27 171 C66 170 99 188 124 211 Z" fill="#485BC4"/>
+  <path d="M124 231 C153 206 187 194 221 195 L221 171 C182 170 149 188 124 211 Z" fill="url(#blue)"/>
+  <path d="M124 25 L176 117 L133 102 L124 95 L115 102 L72 117 Z" fill="url(#blue)"/>
+  <path d="M124 95 L124 25 L176 117 L133 102 Z" fill="#493CC4" opacity=".7"/>
+  <path d="M124 105 C132 142 142 164 124 198" fill="none" stroke="#C3D1FF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M34 71 C49 71 56 64 56 50 C56 64 63 71 78 71 C63 71 56 78 56 92 C56 78 49 71 34 71Z" fill="#A5B7FF"/>
+  <path d="M188 51 C199 51 204 46 204 35 C204 46 209 51 220 51 C209 51 204 56 204 67 C204 56 199 51 188 51Z" fill="#A5B7FF"/>
+</g>
+<text x="290" y="145" font-family="Manrope, DM Sans, Arial, sans-serif" font-size="74" font-weight="800" letter-spacing="-2.5" fill="#192640">Study</text>
+<text x="522" y="145" font-family="Manrope, DM Sans, Arial, sans-serif" font-size="74" font-weight="800" letter-spacing="-2.5" fill="url(#blue)">Pilot</text>
+<path d="M296 183 H368" stroke="#A6B5F7" stroke-width="4" stroke-linecap="round"/>
+<text x="387" y="191" font-family="DM Sans, Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="7" fill="#748099">PLAN  LEARN  PROGRESS</text>
+<path d="M766 183 H835" stroke="#A6B5F7" stroke-width="4" stroke-linecap="round"/>
+</svg>
