@@ -7,48 +7,42 @@ import streamlit as st
 
 st.set_page_config(page_title="StudyPilot", page_icon="S", layout="wide", initial_sidebar_state="expanded")
 
+# Use Streamlit-native components for reliable contrast and responsive rendering.
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
-:root { --ink:#192640; --muted:#748099; --line:#e7ebf3; --accent:#5264c9; --accent-dark:#3f4fae; --soft:#eef1ff; }
-html, body, [class*="css"] {font-family:'DM Sans',sans-serif;}
-.stApp {background:#f6f7fb;color:var(--ink);}
-.block-container {max-width:1220px;padding:1.65rem 2.2rem 3rem;}
-h1,h2,h3 {font-family:'Manrope',sans-serif;letter-spacing:-.55px;color:var(--ink);}
-h2 {font-size:1.35rem;} h3 {font-size:1.05rem;}
-[data-testid="stSidebar"] {background:#fff;border-right:1px solid var(--line);}
-[data-testid="stSidebar"] > div {padding-top:1.25rem;}
-[data-testid="stMetric"] {background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px 18px;box-shadow:0 3px 12px rgba(31,48,86,.025);}
-[data-testid="stMetricLabel"] {color:#778198;font-size:.8rem;font-weight:600;}
-[data-testid="stMetricValue"] {color:#1b2d50;font-family:'Manrope',sans-serif;font-weight:800;font-size:1.65rem;}
-div[data-testid="stTabs"] {margin-top:1.15rem;}
-div[data-testid="stTabs"] button {font-weight:700;font-size:.9rem;padding-top:.7rem;padding-bottom:.7rem;}
-.stButton>button,.stDownloadButton>button {border-radius:10px;font-weight:700;min-height:2.55rem;transition:all .15s ease;}
-.stButton>button[kind="primary"] {background:var(--accent);border-color:var(--accent);color:white;}
-.stButton>button[kind="primary"]:hover {background:var(--accent-dark);border-color:var(--accent-dark);}
-div[data-testid="stForm"] {background:#fff;border:1px solid var(--line);border-radius:15px;padding:20px;}
-div[data-testid="stDataFrame"],div[data-testid="stTable"] {border:1px solid var(--line);border-radius:11px;overflow:hidden;}
-hr {border-color:var(--line);}
-.hero {background:linear-gradient(115deg,#eef1ff 0%,#f8f9ff 65%,#f1f3ff 100%);border:1px solid #e4e8ff;padding:28px 30px;border-radius:20px;margin-bottom:22px;}
-.hero .eyebrow {font-size:.7rem;letter-spacing:1.7px;text-transform:uppercase;font-weight:800;color:var(--accent);margin-bottom:10px;}
-.hero h1 {font-family:'Manrope',sans-serif;font-size:2.15rem;line-height:1.14;margin:0;color:#182746;font-weight:800;}
-.hero p {font-size:.96rem;color:#65718b;margin:.65rem 0 0;max-width:700px;line-height:1.55;}
-.metric {background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px 18px;min-height:112px;box-shadow:0 3px 12px rgba(31,48,86,.025);}
-.metric .label {font-size:.79rem;color:#778198;font-weight:600;}
-.metric .value {font:800 1.65rem 'Manrope',sans-serif;color:#1b2d50;margin-top:7px;letter-spacing:-.5px;}
-.metric .note {font-size:.75rem;color:#8a93a7;margin-top:3px;}
-.panel {background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px;margin:0 0 10px;box-shadow:0 3px 10px rgba(31,48,86,.02);}
-.panel-title {font-weight:800;color:#1e2d4b;font-size:.96rem;margin-bottom:5px;line-height:1.35;}
-.panel-sub {font-size:.81rem;color:#778198;}
-.score {display:inline-block;background:var(--soft);color:#424fb3;border-radius:7px;padding:4px 8px;font-size:.74rem;font-weight:800;}
-.callout {border:1px solid #e1e6ff;background:#f1f3ff;padding:13px 15px;border-radius:12px;color:#38456b;font-size:.9rem;line-height:1.5;}
-.section-label {font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;color:#8791a6;margin-bottom:5px;}
-div[data-testid="stAlert"] {border-radius:11px;}
-footer {visibility:hidden;}
+:root { color-scheme: light; }
+html, body, [class*="css"] { font-family:'DM Sans',sans-serif; }
+.stApp { background:#f5f7fb; color:#18243b; }
+.block-container { max-width:1180px; padding:1.5rem 2rem 3rem; }
+h1,h2,h3 { font-family:'Manrope',sans-serif !important; color:#18243b !important; letter-spacing:-.4px; }
+p, label, .stMarkdown, [data-testid="stWidgetLabel"] { color:#263550; }
+[data-testid="stSidebar"] { background:#ffffff; border-right:1px solid #e2e7f0; }
+[data-testid="stSidebar"] * { color:#263550; }
+[data-testid="stMetric"] { background:#ffffff; border:1px solid #e1e6f0; border-radius:14px; padding:16px; }
+[data-testid="stMetricLabel"] { color:#5c6880 !important; }
+[data-testid="stMetricValue"] { color:#182b50 !important; font-weight:800; }
+[data-testid="stTabs"] button { font-weight:700; color:#43516a; }
+[data-testid="stTabs"] button[aria-selected="true"] { color:#4053bd; }
+.stButton button, .stDownloadButton button, [data-testid="stFormSubmitButton"] button { border-radius:9px; font-weight:700; min-height:2.6rem; }
+.stButton button[kind="primary"], [data-testid="stFormSubmitButton"] button[kind="primary"] { background:#485bc4; border-color:#485bc4; color:#ffffff; }
+div[data-testid="stForm"] { background:#ffffff; border:1px solid #e1e6f0; border-radius:14px; padding:18px; }
+div[data-testid="stDataFrame"] { background:#ffffff; border:1px solid #e1e6f0; border-radius:10px; }
+hr { border-color:#e1e6f0; }
+.hero { background:#eaf0ff; border:1px solid #d8e2ff; border-radius:18px; padding:26px 28px; margin-bottom:22px; }
+.hero .eyebrow { color:#4053bd; font-size:.72rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+.hero h1 { font-size:2rem; line-height:1.18; margin:0; color:#172747 !important; }
+.hero p { color:#40506c; font-size:.98rem; margin:.65rem 0 0; max-width:760px; line-height:1.55; }
+.task-card { background:#ffffff; border:1px solid #e1e6f0; border-radius:12px; padding:14px 16px; margin-bottom:10px; }
+.task-time { color:#52617a; font-size:.82rem; font-weight:700; }
+.task-title { color:#182b50; font-size:1rem; font-weight:800; margin:5px 0; }
+.task-meta { color:#52617a; font-size:.86rem; }
+.small-label { color:#68758e; font-size:.75rem; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; }
+div[data-testid="stAlert"] { border-radius:10px; }
 @media (max-width: 800px) {
- .block-container {padding:1rem 1rem 2rem;}
- .hero {padding:22px 20px;}
- .hero h1 {font-size:1.7rem;}
+ .block-container { padding:1rem .8rem 2rem; }
+ .hero { padding:20px; }
+ .hero h1 { font-size:1.55rem; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -58,65 +52,65 @@ DIFFICULTY = {"Easy": 1, "Moderate": 2, "Hard": 3, "Very hard": 4}
 
 def demo_tasks(today):
     return [
-        {"Subject":"Computer Networks","Task":"Subnetting practice","Exam date":today+timedelta(days=2),"Hours":2.0,"Difficulty":"Hard","Importance":"Critical","Status":"Pending","Notes":"Practice VLSM and CIDR"},
-        {"Subject":"Artificial Intelligence","Task":"Heuristic search revision","Exam date":today+timedelta(days=3),"Hours":1.5,"Difficulty":"Moderate","Importance":"High","Status":"Pending","Notes":"A*, Best-First Search, hill climbing"},
+        {"Subject":"Artificial Intelligence","Task":"Heuristic search revision","Exam date":today+timedelta(days=3),"Hours":1.5,"Difficulty":"Moderate","Importance":"High","Status":"Pending","Notes":"Best-First Search, Hill Climbing, A*"},
+        {"Subject":"Computer Networks","Task":"Subnetting practice","Exam date":today+timedelta(days=2),"Hours":2.0,"Difficulty":"Hard","Importance":"Critical","Status":"Pending","Notes":"Practice CIDR and VLSM"},
         {"Subject":"Artificial Intelligence","Task":"State-space problem practice","Exam date":today+timedelta(days=3),"Hours":1.0,"Difficulty":"Moderate","Importance":"High","Status":"Pending","Notes":"Trace states and solution paths"},
         {"Subject":"Software Engineering","Task":"UML diagrams","Exam date":today+timedelta(days=5),"Hours":1.5,"Difficulty":"Moderate","Importance":"Normal","Status":"Pending","Notes":"Use-case, activity, sequence"},
         {"Subject":"Computer Networks","Task":"TCP and congestion control","Exam date":today+timedelta(days=2),"Hours":1.0,"Difficulty":"Moderate","Importance":"High","Status":"Pending","Notes":"Slow start and AIMD"},
         {"Subject":"Cloud Computing","Task":"Service and deployment models","Exam date":today+timedelta(days=7),"Hours":1.5,"Difficulty":"Moderate","Importance":"Normal","Status":"Pending","Notes":"IaaS, PaaS, SaaS"},
-        {"Subject":"Artificial Intelligence","Task":"Practice questions","Exam date":today+timedelta(days=3),"Hours":1.0,"Difficulty":"Easy","Importance":"Normal","Status":"Pending","Notes":"Attempt before checking solutions"},
+        {"Subject":"Artificial Intelligence","Task":"Practice questions","Exam date":today+timedelta(days=3),"Hours":1.0,"Difficulty":"Easy","Importance":"Normal","Status":"Pending","Notes":"Try questions before viewing solutions"},
     ]
 
-def score(task, today):
-    days = max(0, (task["Exam date"]-today).days)
-    urgency = 10/(days+1)
-    difficulty = DIFFICULTY.get(task["Difficulty"], 2)*1.4
-    importance = IMPORTANCE.get(task["Importance"], 2)*1.8
-    workload = min(float(task["Hours"]), 3)*0.25
-    return round(urgency+difficulty+importance+workload, 2)
+def heuristic(task, today):
+    days = max(0, (task["Exam date"] - today).days)
+    urgency = 10 / (days + 1)
+    difficulty = DIFFICULTY.get(task["Difficulty"], 2) * 1.4
+    importance = IMPORTANCE.get(task["Importance"], 2) * 1.8
+    workload = min(float(task["Hours"]), 3) * 0.25
+    return round(urgency + difficulty + importance + workload, 2)
 
 def best_first_search(tasks, today):
-    # Greedy Best-First Search: explore the pending task with the highest heuristic first.
-    queue, counter = [], itertools.count()
+    """Greedy Best-First Search ranks tasks by the highest heuristic score."""
+    frontier, counter = [], itertools.count()
     for task in tasks:
-        heapq.heappush(queue, (-score(task, today), next(counter), task))
-    ranked, expanded = [], 0
-    while queue:
-        neg_score, _, task = heapq.heappop(queue)
-        ranked.append({**task, "Priority score":round(-neg_score,2),
-                       "Days left":max(0,(task["Exam date"]-today).days)})
-        expanded += 1
-    return ranked, expanded
+        heapq.heappush(frontier, (-heuristic(task, today), next(counter), task))
+    ranked = []
+    while frontier:
+        negative_score, _, task = heapq.heappop(frontier)
+        ranked.append({**task, "Priority score": round(-negative_score, 2),
+                       "Days left": max(0, (task["Exam date"] - today).days)})
+    return ranked
 
 def make_schedule(tasks, today, hours_per_day, start_hour):
-    ranked, expanded = best_first_search([t for t in tasks if t["Status"]!="Completed"], today)
-    usage, sessions = {}, []
+    pending = [t for t in tasks if t.get("Status", "Pending") != "Completed"]
+    ranked = best_first_search(pending, today)
+    used, sessions = {}, []
     for task in ranked:
         remaining = float(task["Hours"])
         while remaining > 0.001:
             day = today
-            while usage.get(day,0) >= hours_per_day-0.001:
+            while used.get(day, 0) >= hours_per_day - 0.001:
                 day += timedelta(days=1)
-                if (day-today).days > 30:
+                if (day - today).days > 30:
                     break
-            if (day-today).days > 30:
+            if (day - today).days > 30:
                 break
-            free = hours_per_day-usage.get(day,0)
-            duration = min(remaining,free)
-            start = datetime.combine(day,datetime.min.time()) + timedelta(hours=start_hour,minutes=int(usage.get(day,0)*60))
-            end = start+timedelta(hours=duration)
-            usage[day] = usage.get(day,0)+duration
-            sessions.append({"Date":day,"Day":day.strftime("%A"),"Start":start.strftime("%I:%M %p"),
-             "End":end.strftime("%I:%M %p"),"Subject":task["Subject"],"Study task":task["Task"],
-             "Hours":round(duration,2),"Importance":task["Importance"],"Priority score":task["Priority score"]})
+            offset = used.get(day, 0)
+            duration = min(remaining, hours_per_day - offset)
+            start = datetime.combine(day, datetime.min.time()) + timedelta(hours=start_hour, minutes=int(offset * 60))
+            end = start + timedelta(hours=duration)
+            used[day] = offset + duration
+            sessions.append({"Date":day, "Day":day.strftime("%A"), "Start":start.strftime("%I:%M %p"),
+                "End":end.strftime("%I:%M %p"), "Subject":task["Subject"], "Study task":task["Task"],
+                "Hours":round(duration, 2), "Importance":task["Importance"], "Priority score":task["Priority score"]})
             remaining -= duration
-    return sessions, ranked, expanded
+    return sessions, ranked
 
-def frame_tasks(tasks):
-    df = pd.DataFrame(tasks)
-    if not df.empty:
-        df["Exam date"] = pd.to_datetime(df["Exam date"]).dt.date
-    return df
+def task_frame(tasks):
+    frame = pd.DataFrame(tasks)
+    if not frame.empty:
+        frame["Exam date"] = pd.to_datetime(frame["Exam date"]).dt.date
+    return frame
 
 today = date.today()
 if "tasks" not in st.session_state:
@@ -126,144 +120,157 @@ if "generated" not in st.session_state:
 
 st.markdown("""
 <div class="hero">
-  <div class="eyebrow">YOUR PERSONAL STUDY WORKSPACE</div>
-  <h1>Make your next study session count.</h1>
-  <p>Bring deadlines, difficult topics, and revision goals into one calm workspace. StudyPilot prioritizes your tasks using heuristic search from the AISC syllabus.</p>
-</div>""", unsafe_allow_html=True)
+  <div class="eyebrow">STUDYPILOT · SMART STUDY PLANNING</div>
+  <h1>Your study plan, clear and under control.</h1>
+  <p>Prioritize exams and assignments with a practical timetable powered by Greedy Best-First Search, a heuristic search technique from your AISC syllabus.</p>
+</div>
+""", unsafe_allow_html=True)
 
-df = frame_tasks(st.session_state.tasks)
-pending = df[df["Status"]!="Completed"] if not df.empty else df
-next_exam = pending["Exam date"].min() if not pending.empty else None
-metrics = [
- ("Pending tasks",str(len(pending)),"Study goals still to do"),
- ("Hours remaining",f'{pending["Hours"].sum():g}h' if not pending.empty else "0h","Estimated workload"),
- ("Completed tasks",str((df["Status"]=="Completed").sum()) if not df.empty else "0","Keep up the momentum"),
- ("Next exam",f'{(next_exam-today).days} days' if next_exam else "—",next_exam.strftime("%d %b") if next_exam else "No pending exams"),
-]
-cols = st.columns(4)
-for c,(label,value,note) in zip(cols,metrics):
-    c.markdown(f'<div class="metric"><div class="label">{label}</div><div class="value">{value}</div><div class="note">{note}</div></div>',unsafe_allow_html=True)
+df = task_frame(st.session_state.tasks)
+pending_df = df[df["Status"] != "Completed"] if not df.empty else df
+pending_count = len(pending_df)
+pending_hours = float(pending_df["Hours"].sum()) if not pending_df.empty else 0
+completed_count = int((df["Status"] == "Completed").sum()) if not df.empty else 0
+next_deadline = pending_df["Exam date"].min() if not pending_df.empty else None
+days_to_exam = (next_deadline - today).days if next_deadline else None
+
+m1, m2, m3, m4 = st.columns(4)
+m1.metric("Pending tasks", pending_count)
+m2.metric("Study hours left", f"{pending_hours:g} h")
+m3.metric("Completed tasks", completed_count)
+m4.metric("Next deadline", f"{days_to_exam} days" if days_to_exam is not None else "—",
+          next_deadline.strftime("%d %b") if next_deadline else "No pending tasks")
 
 with st.sidebar:
     st.markdown("## StudyPilot")
-    st.caption("A calmer way to prepare.")
+    st.caption("A focused workspace for exam preparation.")
     st.divider()
-    st.markdown("### Plan settings")
-    hours_per_day = st.slider("Study capacity per day",1.0,10.0,4.0,0.5)
-    start_hour = st.selectbox("Preferred start time",list(range(6,21)),index=9,format_func=lambda h:datetime.strptime(str(h),"%H").strftime("%I:00 %p"))
-    horizon = st.slider("Schedule view",3,21,7)
-    st.caption("Priorities balance deadline, difficulty, importance, and workload.")
+    st.markdown("### Schedule settings")
+    hours_per_day = st.slider("Daily study capacity", 1.0, 10.0, 4.0, 0.5)
+    start_hour = st.selectbox("Start time", list(range(6, 21)), index=9,
+        format_func=lambda hour: datetime.strptime(str(hour), "%H").strftime("%I:%M %p"))
+    horizon = st.slider("Days to show", 3, 21, 7)
     st.divider()
-    if st.button("↻ Restore sample tasks",use_container_width=True):
+    if st.button("Restore demo tasks", use_container_width=True):
         st.session_state.tasks = demo_tasks(date.today())
         st.session_state.generated = False
         st.rerun()
-    if st.button("🗑 Clear all tasks",use_container_width=True):
+    if st.button("Clear all tasks", use_container_width=True):
         st.session_state.tasks = []
         st.session_state.generated = False
         st.rerun()
+    st.caption("Demo data is included so you can present the project immediately.")
 
-plan_tab, tasks_tab, ai_tab = st.tabs(["🗓️ Smart study plan","📚 Manage tasks","🧠 How the AI works"])
+plan_tab, tasks_tab, algorithm_tab = st.tabs(["Study plan", "Manage tasks", "Algorithm"])
+
 with plan_tab:
-    head, button = st.columns([1.6,1])
-    head.markdown("### Your schedule")
-    head.caption("Tasks are ranked by the heuristic score before being placed into daily study capacity.")
-    if button.button("✨ Generate plan",type="primary",use_container_width=True):
-        st.session_state.generated = True
+    st.markdown("## Your study schedule")
+    st.caption("Tasks with the highest heuristic priority are scheduled first.")
+    controls = st.columns([1, 2])
+    with controls[0]:
+        if st.button("Generate study plan", type="primary", use_container_width=True):
+            st.session_state.generated = True
+    with controls[1]:
+        st.caption("Adjust your daily capacity and start time in the sidebar.")
+    sessions, ranked = make_schedule(st.session_state.tasks, today, hours_per_day, start_hour)
     if not st.session_state.generated:
-        st.info("Demo tasks are loaded. Click **Generate smart plan** to create your first timetable.")
-    sessions, ranked, expanded = make_schedule(st.session_state.tasks,date.today(),hours_per_day,start_hour)
-    if sessions:
-        sdf = pd.DataFrame(sessions)
-        sdf = sdf[pd.to_datetime(sdf["Date"]) <= pd.Timestamp(today+timedelta(days=horizon-1))]
+        st.info("Your demo tasks are loaded. Select **Generate study plan** to build the timetable.")
+    if not sessions:
+        st.warning("No pending tasks. Add a task in Manage tasks or restore the demo tasks.")
+    else:
+        schedule_df = pd.DataFrame(sessions)
+        schedule_df = schedule_df[pd.to_datetime(schedule_df["Date"]) <= pd.Timestamp(today + timedelta(days=horizon - 1))]
         if st.session_state.generated:
-            st.success(f"Plan generated by Greedy Best-First Search · {len(sdf)} session(s) in the selected horizon.")
-        if not sdf.empty:
-            days = sorted(sdf["Date"].unique())
-            for row_start in range(0,len(days),3):
-                day_cols = st.columns(min(3,len(days)-row_start))
-                for col,day in zip(day_cols,days[row_start:row_start+3]):
-                    daily = sdf[sdf["Date"]==day]
-                    with col:
-                        st.markdown(f"**{day.strftime('%a, %d %b')}**")
-                        st.caption(f'{daily["Hours"].sum():g} study hours')
-                        for _,item in daily.iterrows():
-                            st.markdown(f'<div class="panel"><div style="font-size:.75rem;color:#7b849a;font-weight:700">{item["Start"]} – {item["End"]}</div><div class="panel-title" style="margin-top:6px">{item["Study task"]}</div><div class="panel-sub">{item["Subject"]}</div><div style="margin-top:9px"><span class="score">{item["Hours"]}h</span><span style="font-size:.75rem;color:#6e7890;margin-left:6px">{item["Importance"]} priority</span></div></div>',unsafe_allow_html=True)
-            with st.expander("View complete timetable and priority scores"):
-                st.dataframe(sdf,use_container_width=True,hide_index=True)
-            st.download_button("⬇️ Download timetable (CSV)",sdf.to_csv(index=False).encode("utf-8"),"studypilot_schedule.csv","text/csv")
-            st.markdown("#### Study time by subject")
-            st.bar_chart(sdf.groupby("Subject")["Hours"].sum().sort_values(ascending=False))
-    elif pending.empty:
-        st.warning("There are no pending tasks. Add a task in Manage tasks or restore demo tasks.")
-    if ranked and st.session_state.generated:
-        with st.expander("See AI priority ranking"):
-            st.dataframe(pd.DataFrame(ranked)[["Subject","Task","Exam date","Difficulty","Importance","Hours","Priority score"]],use_container_width=True,hide_index=True)
+            st.success(f"Plan generated successfully · {len(schedule_df)} session blocks shown.")
+        if schedule_df.empty:
+            st.info("No study sessions fall within this date range. Increase Days to show.")
+        else:
+            for session_day in sorted(schedule_df["Date"].unique()):
+                day_items = schedule_df[schedule_df["Date"] == session_day]
+                st.markdown(f"### {session_day.strftime('%A, %d %B')}")
+                st.caption(f"{day_items['Hours'].sum():g} hours planned")
+                for _, item in day_items.iterrows():
+                    st.markdown(f"""
+                    <div class="task-card">
+                      <div class="task-time">{item["Start"]} – {item["End"]} &nbsp; · &nbsp; {item["Hours"]:g} hours</div>
+                      <div class="task-title">{item["Study task"]}</div>
+                      <div class="task-meta">{item["Subject"]} &nbsp; · &nbsp; {item["Importance"]} priority</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            with st.expander("View timetable as a table"):
+                st.dataframe(schedule_df, use_container_width=True, hide_index=True)
+            st.download_button("Download timetable as CSV", schedule_df.to_csv(index=False).encode("utf-8"),
+                               "studypilot_schedule.csv", "text/csv")
+            st.markdown("### Study time by subject")
+            st.bar_chart(schedule_df.groupby("Subject")["Hours"].sum().sort_values(ascending=False))
+        if ranked:
+            with st.expander("View heuristic priority ranking"):
+                st.dataframe(pd.DataFrame(ranked)[["Subject", "Task", "Exam date", "Difficulty", "Importance", "Priority score"]],
+                             use_container_width=True, hide_index=True)
 
 with tasks_tab:
-    st.markdown("### Organize your study tasks")
-    with st.form("add_task",clear_on_submit=True):
-        a,b = st.columns(2)
-        subject = a.text_input("Subject",placeholder="e.g. Artificial Intelligence")
-        task = b.text_input("Study task",placeholder="e.g. Revise A* search")
-        c,d,e = st.columns(3)
-        due = c.date_input("Exam / deadline",value=today+timedelta(days=4))
-        hours = d.number_input("Estimated hours",min_value=0.25,max_value=100.0,value=1.5,step=0.25)
-        difficulty = e.selectbox("Difficulty",list(DIFFICULTY),index=1)
-        f,g = st.columns(2)
-        importance = f.selectbox("Importance",list(IMPORTANCE),index=1)
-        notes = g.text_input("Notes (optional)")
-        submitted = st.form_submit_button("＋ Add task",type="primary")
-        if submitted:
-            if not subject.strip() or not task.strip():
-                st.error("Please enter both a subject and a task.")
+    st.markdown("## Manage your tasks")
+    st.caption("Add a study goal, then edit task details or mark tasks completed below.")
+    with st.form("add_task", clear_on_submit=True):
+        left, right = st.columns(2)
+        subject = left.text_input("Subject", placeholder="Artificial Intelligence")
+        task_name = right.text_input("Task name", placeholder="Revise Best-First Search")
+        c1, c2, c3 = st.columns(3)
+        due_date = c1.date_input("Exam / deadline", value=today + timedelta(days=4))
+        hours = c2.number_input("Estimated hours", min_value=0.25, max_value=100.0, value=1.5, step=0.25)
+        difficulty = c3.selectbox("Difficulty", list(DIFFICULTY), index=1)
+        c4, c5 = st.columns(2)
+        importance = c4.selectbox("Importance", list(IMPORTANCE), index=1)
+        notes = c5.text_input("Notes (optional)")
+        add = st.form_submit_button("Add task", type="primary")
+        if add:
+            if not subject.strip() or not task_name.strip():
+                st.error("Please enter both a subject and a task name.")
             else:
-                st.session_state.tasks.append({"Subject":subject.strip(),"Task":task.strip(),"Exam date":due,
-                "Hours":float(hours),"Difficulty":difficulty,"Importance":importance,"Status":"Pending","Notes":notes.strip()})
+                st.session_state.tasks.append({"Subject":subject.strip(), "Task":task_name.strip(),
+                    "Exam date":due_date, "Hours":float(hours), "Difficulty":difficulty, "Importance":importance,
+                    "Status":"Pending", "Notes":notes.strip()})
                 st.session_state.generated = False
-                st.success("Task added.")
                 st.rerun()
     if st.session_state.tasks:
-        editable = st.data_editor(frame_tasks(st.session_state.tasks),use_container_width=True,hide_index=True,num_rows="dynamic",
-          column_config={"Exam date":st.column_config.DateColumn(format="DD MMM YYYY"),
-           "Hours":st.column_config.NumberColumn(min_value=.25,step=.25,format="%.2f h"),
-           "Difficulty":st.column_config.SelectboxColumn(options=list(DIFFICULTY)),
-           "Importance":st.column_config.SelectboxColumn(options=list(IMPORTANCE)),
-           "Status":st.column_config.SelectboxColumn(options=["Pending","Completed"])},key="editor")
-        if st.button("💾 Save changes",type="primary"):
-            editable["Exam date"] = pd.to_datetime(editable["Exam date"]).dt.date
-            st.session_state.tasks = editable.fillna("").to_dict("records")
+        st.markdown("### Existing tasks")
+        edited = st.data_editor(task_frame(st.session_state.tasks), use_container_width=True, hide_index=True,
+            num_rows="dynamic", key="tasks_editor",
+            column_config={
+                "Exam date":st.column_config.DateColumn(format="DD MMM YYYY"),
+                "Hours":st.column_config.NumberColumn(min_value=0.25, step=0.25, format="%.2f h"),
+                "Difficulty":st.column_config.SelectboxColumn(options=list(DIFFICULTY)),
+                "Importance":st.column_config.SelectboxColumn(options=list(IMPORTANCE)),
+                "Status":st.column_config.SelectboxColumn(options=["Pending", "Completed"])
+            })
+        if st.button("Save task changes", type="primary"):
+            edited["Exam date"] = pd.to_datetime(edited["Exam date"]).dt.date
+            st.session_state.tasks = edited.fillna("").to_dict("records")
             st.session_state.generated = False
-            st.success("Task list saved.")
             st.rerun()
     else:
-        st.info("No tasks yet — add one above or restore the demo data in the sidebar.")
+        st.info("No tasks yet. Add one above or restore the demo tasks in the sidebar.")
 
-with ai_tab:
-    st.markdown("### How the heuristic works")
-    st.write("Each pending study task is represented as a state. The heuristic estimates how urgently the task should be considered, and a priority queue selects the highest-scoring task first.")
+with algorithm_tab:
+    st.markdown("## How the algorithm works")
+    st.write("This project uses Greedy Best-First Search, a heuristic search technique listed in the AISC syllabus. Each pending study task receives a score, and the task with the highest score is selected first.")
     st.latex(r"h(n)=\frac{10}{d+1}+1.4D+1.8I+0.25\min(H,3)")
+    st.markdown("### Heuristic factors")
     st.markdown("""
-**Heuristic components**
-- **Urgency:** 10 divided by (days until deadline + 1). A nearer exam scores higher.
-- **Difficulty:** Easy = 1, Moderate = 2, Hard = 3, Very hard = 4.
-- **Importance:** Low = 1, Normal = 2, High = 3, Critical = 4.
-- **Workload:** A small tie-breaker based on estimated study hours.
-
-**How search works**
-1. Put all pending tasks in a priority queue.
-2. Calculate the heuristic score for every task.
-3. Remove the highest-scoring task from the queue.
-4. Add it to the ranking and repeat until the queue is empty.
-5. Pack ranked tasks into the available daily study hours.
-
-**Important limitation:** Greedy Best-First Search is fast and explainable, but it does not guarantee a globally optimal timetable. This demo keeps tasks in browser session state; persistent multi-user storage could be added using a database.
-
-**Cloud component:** Streamlit Community Cloud can host this app from the GitHub repository. The app requires no API keys.
+- **Urgency (d):** fewer days until the exam gives a higher score.
+- **Difficulty (D):** Easy = 1, Moderate = 2, Hard = 3, Very hard = 4.
+- **Importance (I):** Low = 1, Normal = 2, High = 3, Critical = 4.
+- **Workload (H):** estimated study hours, capped at 3 for this score.
 """)
-    if ranked:
-        st.markdown("#### Live heuristic score examples")
-        st.dataframe(pd.DataFrame(ranked)[["Subject","Task","Days left","Difficulty","Importance","Priority score"]],use_container_width=True,hide_index=True)
+    st.markdown("### Search process")
+    st.markdown("""
+1. Treat each pending task as a state.
+2. Calculate its heuristic score.
+3. Put tasks into a priority queue.
+4. Select the task with the highest score and repeat until all tasks are ranked.
+5. Place ranked tasks into daily sessions without exceeding the chosen daily study capacity.
+""")
+    st.info("Greedy Best-First Search is simple and explainable, but it does not guarantee a globally optimal timetable. Tasks are stored in session state in this demo, not a permanent database.")
 
 st.divider()
-st.markdown("<div style='text-align:center;color:#8791a6;font-size:.8rem'>StudyPilot · Artificial Intelligence and Soft Computing · Heuristic Search project</div>",unsafe_allow_html=True)
+st.caption("StudyPilot · Artificial Intelligence and Soft Computing · Heuristic Search course project")
