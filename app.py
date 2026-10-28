@@ -436,7 +436,7 @@ with syllabus_tab:
             try:
                 extracted_text, extracted_topics = extract_topics(handout)
                 st.session_state.handout_subject = subject_choice.strip()
-                st.session_state.handout_exam_day = exam_day
+                st.session_state.extracted_exam_day = exam_day
                 st.session_state.handout_hours = float(default_hours)
                 st.session_state.extracted_topics = extracted_topics
                 st.session_state.handout_filename = handout.name
@@ -471,7 +471,7 @@ with syllabus_tab:
                 if key in existing:
                     continue
                 st.session_state.tasks.append({"Subject":st.session_state.handout_subject, "Task":topic,
-                    "Exam date":st.session_state.handout_exam_day, "Hours":float(per_topic_hours),
+                    "Exam date":st.session_state.extracted_exam_day, "Hours":float(per_topic_hours),
                     "Difficulty":topic_difficulty, "Importance":topic_importance, "Status":"Pending",
                     "Notes":"Extracted from " + st.session_state.get("handout_filename", "course handout")})
                 existing.add(key)
