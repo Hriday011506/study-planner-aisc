@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 import pandas as pd
 import streamlit as st
 
-st.set_page_config(page_title="StudyPilot | Smart Study Planner", page_icon="🎓", layout="wide")
+st.set_page_config(page_title="StudyPilot", page_icon="S", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
