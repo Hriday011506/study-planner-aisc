@@ -304,12 +304,19 @@ def save_tasks():
         pass
 
 def load_tasks():
-    """Load saved tasks, falling back to demo data for a first-time visitor."""
+    """Load saved user tasks, excluding the app's old built-in demo topics."""
+    demo_titles = {
+        "Heuristic search revision", "Subnetting practice", "State-space problem practice",
+        "UML diagrams", "TCP and congestion control", "Service and deployment models",
+        "Practice questions"
+    }
     try:
         if os.path.exists(DATA_FILE):
             with open(DATA_FILE, "r", encoding="utf-8") as data_file:
                 saved = json.load(data_file)
             if isinstance(saved, list):
+                # Clean out previously seeded demo topics while preserving user-added topics.
+                saved = [item for item in saved if item.get("Task") not in demo_titles]
                 for item in saved:
                     if item.get("Exam date"):
                         item["Exam date"] = pd.to_datetime(item["Exam date"]).date()
@@ -317,7 +324,7 @@ def load_tasks():
                 return saved
     except (OSError, json.JSONDecodeError, TypeError, ValueError):
         pass
-    return demo_tasks(today)
+    return []
 
 if "tasks" not in st.session_state:
     st.session_state.tasks = load_tasks()
@@ -463,17 +470,12 @@ with st.sidebar:
         format_func=lambda hour: datetime.strptime(str(hour), "%H").strftime("%I:%M %p"))
     horizon = st.slider("Days to show", 3, 21, 7)
     st.divider()
-    if st.button("Restore demo tasks", use_container_width=True):
-        st.session_state.tasks = demo_tasks(date.today())
-        save_tasks()
-        st.session_state.generated = False
-        st.rerun()
     if st.button("Clear all tasks", use_container_width=True):
         st.session_state.tasks = []
         save_tasks()
         st.session_state.generated = False
         st.rerun()
-    st.caption("Demo data is included so you can present the project immediately.")
+    st.caption("Your planner starts empty. Add topics manually or upload a course handout to build your own study plan.")
 
 
 if st.session_state.get("show_topic_schedule", False):
