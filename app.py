@@ -375,7 +375,9 @@ with syllabus_tab:
     st.markdown("## Build a study plan from your course handout")
     st.caption("Choose a subject and upload the syllabus. StudyPilot extracts topics for you to review before adding them to your plan.")
     with st.form("handout_setup"):
-        subject_choice = st.text_input("Subject name", placeholder="e.g. Artificial Intelligence and Soft Computing")
+        subject_option = st.selectbox("Choose subject", ["Artificial Intelligence and Soft Computing", "Artificial Intelligence", "Computer Networks", "Predictive Analytics", "Software Engineering", "Cloud Computing", "Other / custom subject"])
+        custom_subject = st.text_input("Enter subject name", placeholder="Type your subject here") if subject_option == "Other / custom subject" else ""
+        subject_choice = custom_subject.strip() if subject_option == "Other / custom subject" else subject_option
         handout = st.file_uploader("Upload course handout", type=["pdf", "docx", "txt"], help="PDF, Word document (.docx), or plain text.")
         exam_day = st.date_input("Exam date", value=today + timedelta(days=7), key="handout_exam_day")
         default_hours = st.number_input("Estimated hours per topic", min_value=0.25, max_value=8.0, value=1.0, step=0.25)
