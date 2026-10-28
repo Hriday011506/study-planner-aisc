@@ -449,7 +449,10 @@ for index, (subject_name, subject_desc, aliases) in enumerate(dashboard_subjects
     with col:
         st.markdown(f"**{index + 1:02d}  {subject_name}**")
         st.caption(subject_desc)
-        st.markdown(f"**{open_count}** tasks left · **{done_count}** completed")
+        st.markdown(f"**{open_count}** topics left · **{done_count}** completed")
+        if st.button("View subject progress", key=f"subject_progress_{index}", use_container_width=True):
+            st.session_state.active_progress_subject = subject_name
+            st.rerun()
         if st.button("Plan this subject", key=f"subject_launch_{index}", use_container_width=True):
             st.session_state.chosen_dashboard_subject = subject_name
             st.session_state["subject_option"] = subject_name
@@ -459,6 +462,56 @@ for index, (subject_name, subject_desc, aliases) in enumerate(dashboard_subjects
         st.divider()
 if st.session_state.get("show_subject_plan_hint"):
     st.info("Selected: " + st.session_state.get("chosen_dashboard_subject", "") + ". Open **Build from handout** to upload its course handout and generate a topic-based plan.")
+
+if st.session_state.get("active_progress_subject"):
+    active_subject = st.session_state.active_progress_subject
+    st.markdown(f"## {active_subject} — topic progress")
+    st.caption("Tick topics as completed or correct the exam date below. Changes are saved to your planner.")
+    active_tasks = [
+        (i, item) for i, item in enumerate(st.session_state.tasks)
+        if str(item.get("Subject", "")).strip().lower() == active_subject.strip().lower()
+        or (active_subject == "Artificial Intelligence and Cloud Computing"
+            and any(term in str(item.get("Subject", "")).lower()
+                    for term in ["artificial intelligence", "cloud computing"]))
+        or (active_subject == "Predictive Analysis"
+            and "predictive analy" in str(item.get("Subject", "")).lower())
+    ]
+    if not active_tasks:
+        st.info("No topics added for this subject yet. Use **Build from handout** or **Manage tasks** to add topics.")
+    else:
+        for task_index, task_item in active_tasks:
+            left, middle, right = st.columns([3, 2, 1])
+            current_done = task_item.get("Status", "Pending") == "Completed"
+            done = left.checkbox(
+                str(task_item.get("Task", "Study topic")),
+                value=current_done,
+                key=f"subject_progress_done_{task_index}",
+                help=f'{task_item.get("Hours", 0)} estimated study hours'
+            )
+            exam_value = task_item.get("Exam date", today)
+            if isinstance(exam_value, str):
+                exam_value = pd.to_datetime(exam_value).date()
+            changed_date = middle.date_input(
+                "Exam date",
+                value=exam_value,
+                key=f"subject_progress_exam_{task_index}"
+            )
+            right.markdown("**Status**")
+            right.write("Completed" if done else "Pending")
+            changed = False
+            if done != current_done:
+                st.session_state.tasks[task_index]["Status"] = "Completed" if done else "Pending"
+                changed = True
+            if changed_date != exam_value:
+                st.session_state.tasks[task_index]["Exam date"] = changed_date
+                changed = True
+            if changed:
+                save_tasks()
+                st.session_state.generated = False
+                st.rerun()
+    if st.button("Close subject progress", key="close_subject_progress"):
+        st.session_state.active_progress_subject = None
+        st.rerun()
 
 with st.sidebar:
     st.image("assets/studypilot-logo.svg", use_container_width=True)
