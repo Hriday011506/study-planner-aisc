@@ -10,34 +10,46 @@ st.set_page_config(page_title="StudyPilot", page_icon="S", layout="wide", initia
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
-:root { --ink:#17233b; --muted:#718096; --line:#e6eaf1; --accent:#4f5fc9; }
+:root { --ink:#192640; --muted:#748099; --line:#e7ebf3; --accent:#5264c9; --accent-dark:#3f4fae; --soft:#eef1ff; }
 html, body, [class*="css"] {font-family:'DM Sans',sans-serif;}
-.stApp {background:#f7f8fb;color:var(--ink);}
-.block-container {max-width:1180px;padding:1.55rem 2rem 3rem;}
-h1,h2,h3 {font-family:'Manrope',sans-serif;letter-spacing:-.45px;color:#17233b;}
+.stApp {background:#f6f7fb;color:var(--ink);}
+.block-container {max-width:1220px;padding:1.65rem 2.2rem 3rem;}
+h1,h2,h3 {font-family:'Manrope',sans-serif;letter-spacing:-.55px;color:var(--ink);}
+h2 {font-size:1.35rem;} h3 {font-size:1.05rem;}
 [data-testid="stSidebar"] {background:#fff;border-right:1px solid var(--line);}
-[data-testid="stSidebar"] > div {padding-top:1.3rem;}
-[data-testid="stMetric"] {background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px 17px;box-shadow:none;}
-[data-testid="stMetricLabel"] {color:#778198;font-size:.82rem;}
-[data-testid="stMetricValue"] {color:#172b53;font-family:'Manrope',sans-serif;font-weight:800;}
-div[data-testid="stTabs"] button {font-weight:700;}
-.stButton>button,.stDownloadButton>button {border-radius:9px;font-weight:700;min-height:2.5rem;}
-.stButton>button[kind="primary"] {background:#4f5fc9;border-color:#4f5fc9;}
-.stButton>button[kind="primary"]:hover {background:#414fae;border-color:#414fae;}
-div[data-testid="stForm"] {background:white;border:1px solid var(--line);border-radius:13px;padding:18px;}
-div[data-testid="stDataFrame"],div[data-testid="stTable"] {border:1px solid var(--line);border-radius:9px;overflow:hidden;}
+[data-testid="stSidebar"] > div {padding-top:1.25rem;}
+[data-testid="stMetric"] {background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px 18px;box-shadow:0 3px 12px rgba(31,48,86,.025);}
+[data-testid="stMetricLabel"] {color:#778198;font-size:.8rem;font-weight:600;}
+[data-testid="stMetricValue"] {color:#1b2d50;font-family:'Manrope',sans-serif;font-weight:800;font-size:1.65rem;}
+div[data-testid="stTabs"] {margin-top:1.15rem;}
+div[data-testid="stTabs"] button {font-weight:700;font-size:.9rem;padding-top:.7rem;padding-bottom:.7rem;}
+.stButton>button,.stDownloadButton>button {border-radius:10px;font-weight:700;min-height:2.55rem;transition:all .15s ease;}
+.stButton>button[kind="primary"] {background:var(--accent);border-color:var(--accent);color:white;}
+.stButton>button[kind="primary"]:hover {background:var(--accent-dark);border-color:var(--accent-dark);}
+div[data-testid="stForm"] {background:#fff;border:1px solid var(--line);border-radius:15px;padding:20px;}
+div[data-testid="stDataFrame"],div[data-testid="stTable"] {border:1px solid var(--line);border-radius:11px;overflow:hidden;}
 hr {border-color:var(--line);}
-.hero {padding:8px 0 22px;border-bottom:1px solid var(--line);margin-bottom:22px;}
-.hero .eyebrow {font-size:.72rem;letter-spacing:1.6px;text-transform:uppercase;font-weight:800;color:var(--accent);margin-bottom:9px;}
-.hero h1 {font-family:'Manrope',sans-serif;font-size:2.2rem;line-height:1.12;margin:0;color:#17233b;font-weight:800;}
-.hero p {font-size:1rem;color:#68758c;margin:.65rem 0 0;max-width:710px;}
-.panel {background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 10px;}
-.panel-title {font-weight:800;color:#1e2d4b;font-size:.98rem;margin-bottom:4px;}
-.panel-sub {font-size:.83rem;color:#778198;}
-.score {display:inline-block;background:#eef0ff;color:#424fb3;border-radius:6px;padding:4px 7px;font-size:.75rem;font-weight:800;}
-.callout {border-left:3px solid #6472d3;background:#f0f2ff;padding:11px 13px;border-radius:0 8px 8px 0;color:#38456b;font-size:.9rem;}
-div[data-testid="stAlert"] {border-radius:9px;}
+.hero {background:linear-gradient(115deg,#eef1ff 0%,#f8f9ff 65%,#f1f3ff 100%);border:1px solid #e4e8ff;padding:28px 30px;border-radius:20px;margin-bottom:22px;}
+.hero .eyebrow {font-size:.7rem;letter-spacing:1.7px;text-transform:uppercase;font-weight:800;color:var(--accent);margin-bottom:10px;}
+.hero h1 {font-family:'Manrope',sans-serif;font-size:2.15rem;line-height:1.14;margin:0;color:#182746;font-weight:800;}
+.hero p {font-size:.96rem;color:#65718b;margin:.65rem 0 0;max-width:700px;line-height:1.55;}
+.metric {background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px 18px;min-height:112px;box-shadow:0 3px 12px rgba(31,48,86,.025);}
+.metric .label {font-size:.79rem;color:#778198;font-weight:600;}
+.metric .value {font:800 1.65rem 'Manrope',sans-serif;color:#1b2d50;margin-top:7px;letter-spacing:-.5px;}
+.metric .note {font-size:.75rem;color:#8a93a7;margin-top:3px;}
+.panel {background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px;margin:0 0 10px;box-shadow:0 3px 10px rgba(31,48,86,.02);}
+.panel-title {font-weight:800;color:#1e2d4b;font-size:.96rem;margin-bottom:5px;line-height:1.35;}
+.panel-sub {font-size:.81rem;color:#778198;}
+.score {display:inline-block;background:var(--soft);color:#424fb3;border-radius:7px;padding:4px 8px;font-size:.74rem;font-weight:800;}
+.callout {border:1px solid #e1e6ff;background:#f1f3ff;padding:13px 15px;border-radius:12px;color:#38456b;font-size:.9rem;line-height:1.5;}
+.section-label {font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;color:#8791a6;margin-bottom:5px;}
+div[data-testid="stAlert"] {border-radius:11px;}
 footer {visibility:hidden;}
+@media (max-width: 800px) {
+ .block-container {padding:1rem 1rem 2rem;}
+ .hero {padding:22px 20px;}
+ .hero h1 {font-size:1.7rem;}
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -114,9 +126,9 @@ if "generated" not in st.session_state:
 
 st.markdown("""
 <div class="hero">
-  <div class="eyebrow">STUDYPILOT / INTELLIGENT STUDY PLANNING</div>
-  <h1>Study smarter, one session at a time.</h1>
-  <p>Turn upcoming exams and assignments into a clear study schedule, guided by heuristic search from your AISC syllabus.</p>
+  <div class="eyebrow">YOUR PERSONAL STUDY WORKSPACE</div>
+  <h1>Make your next study session count.</h1>
+  <p>Bring deadlines, difficult topics, and revision goals into one calm workspace. StudyPilot prioritizes your tasks using heuristic search from the AISC syllabus.</p>
 </div>""", unsafe_allow_html=True)
 
 df = frame_tasks(st.session_state.tasks)
@@ -133,14 +145,14 @@ for c,(label,value,note) in zip(cols,metrics):
     c.markdown(f'<div class="metric"><div class="label">{label}</div><div class="value">{value}</div><div class="note">{note}</div></div>',unsafe_allow_html=True)
 
 with st.sidebar:
-    st.markdown("## 🎓 StudyPilot")
-    st.caption("Plan with purpose. Learn with confidence.")
+    st.markdown("## StudyPilot")
+    st.caption("A calmer way to prepare.")
     st.divider()
-    st.markdown("### Planning preferences")
+    st.markdown("### Plan settings")
     hours_per_day = st.slider("Study capacity per day",1.0,10.0,4.0,0.5)
     start_hour = st.selectbox("Preferred start time",list(range(6,21)),index=9,format_func=lambda h:datetime.strptime(str(h),"%H").strftime("%I:00 %p"))
     horizon = st.slider("Schedule view",3,21,7)
-    st.caption("Priority = urgency + difficulty + importance + workload.")
+    st.caption("Priorities balance deadline, difficulty, importance, and workload.")
     st.divider()
     if st.button("↻ Restore sample tasks",use_container_width=True):
         st.session_state.tasks = demo_tasks(date.today())
@@ -180,7 +192,7 @@ with plan_tab:
             with st.expander("View complete timetable and priority scores"):
                 st.dataframe(sdf,use_container_width=True,hide_index=True)
             st.download_button("⬇️ Download timetable (CSV)",sdf.to_csv(index=False).encode("utf-8"),"studypilot_schedule.csv","text/csv")
-            st.markdown("#### Workload by subject")
+            st.markdown("#### Study time by subject")
             st.bar_chart(sdf.groupby("Subject")["Hours"].sum().sort_values(ascending=False))
     elif pending.empty:
         st.warning("There are no pending tasks. Add a task in Manage tasks or restore demo tasks.")
@@ -189,7 +201,7 @@ with plan_tab:
             st.dataframe(pd.DataFrame(ranked)[["Subject","Task","Exam date","Difficulty","Importance","Hours","Priority score"]],use_container_width=True,hide_index=True)
 
 with tasks_tab:
-    st.markdown("### Add a task")
+    st.markdown("### Organize your study tasks")
     with st.form("add_task",clear_on_submit=True):
         a,b = st.columns(2)
         subject = a.text_input("Subject",placeholder="e.g. Artificial Intelligence")
@@ -228,7 +240,7 @@ with tasks_tab:
         st.info("No tasks yet — add one above or restore the demo data in the sidebar.")
 
 with ai_tab:
-    st.markdown("### Heuristic search, explained")
+    st.markdown("### How the heuristic works")
     st.write("Each pending study task is represented as a state. The heuristic estimates how urgently the task should be considered, and a priority queue selects the highest-scoring task first.")
     st.latex(r"h(n)=\frac{10}{d+1}+1.4D+1.8I+0.25\min(H,3)")
     st.markdown("""
