@@ -507,15 +507,19 @@ if st.session_state.get("active_progress_subject"):
         st.markdown("### Topic checklist")
         for task_index, task_item in active_tasks:
             current_done = task_item.get("Status", "Pending") == "Completed"
+            subject_key = f"subject_progress_done_{task_index}"
+            schedule_key = f"topic_schedule_done_{task_index}"
+            if subject_key not in st.session_state or st.session_state[subject_key] != current_done:
+                st.session_state[subject_key] = current_done
             done = st.checkbox(
                 str(task_item.get("Task", "Study topic")),
-                value=current_done,
-                key=f"subject_progress_done_{task_index}",
+                key=subject_key,
                 help=f'{task_item.get("Hours", 0)} estimated study hours'
             )
             st.caption(f'{task_item.get("Hours", 0)} study hours · {"Completed" if done else "Pending"}')
             if done != current_done:
                 st.session_state.tasks[task_index]["Status"] = "Completed" if done else "Pending"
+                st.session_state[schedule_key] = done
                 save_tasks()
                 st.session_state.generated = False
                 st.rerun()
@@ -557,11 +561,35 @@ if st.session_state.get("show_topic_schedule", False):
             day_plan = topic_schedule_df[topic_schedule_df["Date"] == schedule_day]
             st.markdown(f"### {schedule_day.strftime('%A, %d %B %Y')}")
             for _, planned_topic in day_plan.iterrows():
-                st.markdown(
-                    f'**{planned_topic["Start"]}–{planned_topic["End"]} · {planned_topic["Study task"]}**  \n'
+                matching_indices = [
+                    i for i, task in enumerate(st.session_state.tasks)
+                    if str(task.get("Subject", "")) == str(planned_topic["Subject"])
+                    and str(task.get("Task", "")) == str(planned_topic["Study task"])
+                ]
+                if not matching_indices:
+                    continue
+                task_index = matching_indices[0]
+                task_item = st.session_state.tasks[task_index]
+                current_done = task_item.get("Status", "Pending") == "Completed"
+                schedule_key = f"topic_schedule_done_{task_index}"
+                subject_key = f"subject_progress_done_{task_index}"
+                if schedule_key not in st.session_state or st.session_state[schedule_key] != current_done:
+                    st.session_state[schedule_key] = current_done
+                done = st.checkbox(
+                    f'{planned_topic["Start"]}–{planned_topic["End"]} · {planned_topic["Study task"]}',
+                    key=schedule_key,
+                    help=f'{planned_topic["Subject"]} · {planned_topic["Hours"]:g} hours'
+                )
+                st.caption(
                     f'{planned_topic["Subject"]} · {planned_topic["Hours"]:g} hours · '
                     f'Exam: {pd.to_datetime(planned_topic["Exam date"]).strftime("%d %b %Y")}'
                 )
+                if done != current_done:
+                    st.session_state.tasks[task_index]["Status"] = "Completed" if done else "Pending"
+                    st.session_state[subject_key] = done
+                    save_tasks()
+                    st.session_state.generated = False
+                    st.rerun()
         completed_topics = [task for task in st.session_state.tasks if task.get("Status") == "Completed"]
         if completed_topics:
             st.markdown("### Already completed")
