@@ -91,24 +91,24 @@ def extract_topics(uploaded_file):
         text = "\n".join(parts)
     else:
         text = raw.decode("utf-8", errors="ignore")
-    lines = [re.sub(r"\\s+", " ", line).strip(" •\t-–—") for line in text.splitlines()]
+    lines = [re.sub(r"\s+", " ", line).strip(" •\t-–—") for line in text.splitlines()]
     lines = [line for line in lines if len(line) >= 3]
     topics = []
     seen = set()
-    heading_pattern = re.compile(r"^(?:(?:unit|module|chapter|lecture|week|topic|experiment)\\s*(?:[0-9ivx]+)?\\s*[:.\\-–)]?\\s*|(?:[0-9]+(?:\\.[0-9]+)*[.)]?\\s+))(.+)$", re.I)
+    heading_pattern = re.compile(r"^(?:(?:unit|module|chapter|lecture|week|topic|experiment)\s*(?:[0-9ivx]+)?\s*[:.\-–)]?\s*|(?:[0-9]+(?:\.[0-9]+)*[.)]?\s+))(.+)$", re.I)
     generic_labels = {"contents", "table of contents", "course outcomes", "references", "text books", "textbooks", "assessment", "evaluation", "syllabus"}
     for line in lines:
-        clean = re.sub(r"\\s+", " ", line).strip()
+        clean = re.sub(r"\s+", " ", line).strip()
         match = heading_pattern.match(clean)
         candidate = match.group(1).strip(" :.-") if match else clean
         if candidate.lower() in generic_labels:
             continue
-        is_bullet = line != clean or re.match(r"^[•*▪◦-]\\s+", line) is not None
+        is_bullet = line != clean or re.match(r"^[•*▪◦-]\s+", line) is not None
         is_heading = match is not None or (len(clean) <= 90 and clean.isupper() and len(clean.split()) <= 12)
         looks_like_topic = any(word in candidate.lower() for word in ["search", "algorithm", "learning", "network", "logic", "agent", "model", "cloud", "knowledge", "game", "neural", "fuzzy", "genetic", "planning", "optimization", "optimization", "module", "unit", "introduction", "architecture", "classification", "regression", "analysis", "management", "security", "computing", "programming", "data", "system", "design", "testing", "heuristic", "hill climbing", "best-first", "a*"])
         if (is_bullet or is_heading or looks_like_topic) and 3 <= len(candidate) <= 120:
             key = candidate.lower()
-            if key not in seen and not re.match(r"^(page|figure|table)\\s+\\d+", key):
+            if key not in seen and not re.match(r"^(page|figure|table)\s+\d+", key):
                 seen.add(key)
                 topics.append(candidate)
     # Keep the list useful and avoid turning whole paragraphs into topics.
