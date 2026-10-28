@@ -366,37 +366,6 @@ with progress_action_col:
 with progress_note_col:
     st.caption("Open your complete plan to see when each topic should be studied across all subjects.")
 
-if st.session_state.get("show_topic_schedule", False):
-    st.markdown("## Your topic-wise study schedule")
-    st.caption("Follow this combined timetable in date and time order. Completed topics are shown separately and are not scheduled again.")
-    schedule_sessions, _ = make_schedule(st.session_state.tasks, today, hours_per_day, start_hour)
-    if schedule_sessions:
-        topic_schedule_df = pd.DataFrame(schedule_sessions)
-        topic_schedule_df["Date"] = pd.to_datetime(topic_schedule_df["Date"]).dt.date
-        topic_schedule_df = topic_schedule_df.sort_values(["Date", "Start"])
-        schedule_summary = st.columns(3)
-        schedule_summary[0].metric("Topics in your plan", topic_schedule_df["Study task"].nunique())
-        schedule_summary[1].metric("Study sessions", len(topic_schedule_df))
-        schedule_summary[2].metric("Planned study time", f'{topic_schedule_df["Hours"].sum():.1f} h')
-        for schedule_day in sorted(topic_schedule_df["Date"].unique()):
-            day_plan = topic_schedule_df[topic_schedule_df["Date"] == schedule_day]
-            st.markdown(f"### {schedule_day.strftime('%A, %d %B %Y')}")
-            for _, planned_topic in day_plan.iterrows():
-                st.markdown(
-                    f'**{planned_topic["Start"]}–{planned_topic["End"]} · {planned_topic["Study task"]}**  \n'
-                    f'{planned_topic["Subject"]} · {planned_topic["Hours"]:g} hours · '
-                    f'Exam: {pd.to_datetime(planned_topic["Exam date"]).strftime("%d %b %Y")}'
-                )
-        completed_topics = [task for task in st.session_state.tasks if task.get("Status") == "Completed"]
-        if completed_topics:
-            st.markdown("### Already completed")
-            for completed_topic in completed_topics:
-                st.markdown(f'- ✅ **{completed_topic.get("Task", "Study topic")}** — {completed_topic.get("Subject", "Subject")}')
-        st.download_button("Download topic-wise schedule (CSV)", topic_schedule_df.to_csv(index=False).encode("utf-8"),
-                           "studypilot_topic_schedule.csv", "text/csv", key="download_topic_schedule")
-    else:
-        st.success("All topics are marked completed. Add more tasks if you want to build another study plan.")
-
 exam_dates = {}
 for task in st.session_state.tasks:
     exam_day = task.get("Exam date", today)
@@ -505,6 +474,38 @@ with st.sidebar:
         st.session_state.generated = False
         st.rerun()
     st.caption("Demo data is included so you can present the project immediately.")
+
+
+if st.session_state.get("show_topic_schedule", False):
+    st.markdown("## Your topic-wise study schedule")
+    st.caption("Follow this combined timetable in date and time order. Completed topics are shown separately and are not scheduled again.")
+    schedule_sessions, _ = make_schedule(st.session_state.tasks, today, hours_per_day, start_hour)
+    if schedule_sessions:
+        topic_schedule_df = pd.DataFrame(schedule_sessions)
+        topic_schedule_df["Date"] = pd.to_datetime(topic_schedule_df["Date"]).dt.date
+        topic_schedule_df = topic_schedule_df.sort_values(["Date", "Start"])
+        schedule_summary = st.columns(3)
+        schedule_summary[0].metric("Topics in your plan", topic_schedule_df["Study task"].nunique())
+        schedule_summary[1].metric("Study sessions", len(topic_schedule_df))
+        schedule_summary[2].metric("Planned study time", f'{topic_schedule_df["Hours"].sum():.1f} h')
+        for schedule_day in sorted(topic_schedule_df["Date"].unique()):
+            day_plan = topic_schedule_df[topic_schedule_df["Date"] == schedule_day]
+            st.markdown(f"### {schedule_day.strftime('%A, %d %B %Y')}")
+            for _, planned_topic in day_plan.iterrows():
+                st.markdown(
+                    f'**{planned_topic["Start"]}–{planned_topic["End"]} · {planned_topic["Study task"]}**  \n'
+                    f'{planned_topic["Subject"]} · {planned_topic["Hours"]:g} hours · '
+                    f'Exam: {pd.to_datetime(planned_topic["Exam date"]).strftime("%d %b %Y")}'
+                )
+        completed_topics = [task for task in st.session_state.tasks if task.get("Status") == "Completed"]
+        if completed_topics:
+            st.markdown("### Already completed")
+            for completed_topic in completed_topics:
+                st.markdown(f'- ✅ **{completed_topic.get("Task", "Study topic")}** — {completed_topic.get("Subject", "Subject")}')
+        st.download_button("Download topic-wise schedule (CSV)", topic_schedule_df.to_csv(index=False).encode("utf-8"),
+                           "studypilot_topic_schedule.csv", "text/csv", key="download_topic_schedule")
+    else:
+        st.success("All topics are marked completed. Add more tasks if you want to build another study plan.")
 
 plan_tab, tasks_tab, syllabus_tab, algorithm_tab = st.tabs(["Study plan", "Manage tasks", "Build from handout", "Algorithm"])
 
