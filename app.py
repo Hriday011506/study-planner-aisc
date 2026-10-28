@@ -369,7 +369,8 @@ st.progress(completion_pct / 100 if total_count else 0)
 progress_action_col, progress_note_col = st.columns([1, 2])
 with progress_action_col:
     if st.button("View my topic-wise study schedule", type="primary", use_container_width=True):
-        st.session_state.show_topic_schedule = not st.session_state.get("show_topic_schedule", False)
+        st.session_state.show_topic_schedule = True
+        st.rerun()
 with progress_note_col:
     st.caption("Open your complete plan to see when each topic should be studied across all subjects.")
 
@@ -598,7 +599,16 @@ if st.session_state.get("show_topic_schedule", False):
         st.download_button("Download topic-wise schedule (CSV)", topic_schedule_df.to_csv(index=False).encode("utf-8"),
                            "studypilot_topic_schedule.csv", "text/csv", key="download_topic_schedule")
     else:
-        st.success("All topics are marked completed. Add more tasks if you want to build another study plan.")
+        completed_topics = [task for task in st.session_state.tasks if task.get("Status") == "Completed"]
+        if not st.session_state.tasks:
+            st.info("Your planner is empty. Add topics in **Manage tasks** or upload a course handout in **Build from handout**; then open this schedule again.")
+        elif completed_topics and len(completed_topics) == len(st.session_state.tasks):
+            st.success("All topics are marked completed. Add more tasks if you want to build another study plan.")
+            st.markdown("### Completed topics")
+            for completed_topic in completed_topics:
+                st.markdown(f'- ✅ **{completed_topic.get("Task", "Study topic")}** — {completed_topic.get("Subject", "Subject")}')
+        else:
+            st.warning("No pending study sessions could be generated. Check that your topics have valid exam dates and estimated study hours.")
 
 plan_tab, tasks_tab, syllabus_tab, algorithm_tab = st.tabs(["Study plan", "Manage tasks", "Build from handout", "Algorithm"])
 
