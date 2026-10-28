@@ -40,6 +40,20 @@ input, textarea { background:#fff !important; color:#1d2b45 !important; border-c
 div[data-testid="stForm"] { background:#fff; border:1px solid #e2e8f2; border-radius:15px; padding:20px; }
 div[data-testid="stDataFrame"] { background:#fff; border:1px solid #e2e8f2; border-radius:11px; }
 hr { border-color:#e2e8f2; }
+.section-heading { display:flex; align-items:end; justify-content:space-between; gap:1rem; margin:1.7rem 0 .9rem; }
+.section-eyebrow { color:#5264c9; font-size:.72rem; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; margin-bottom:4px; }
+.section-caption { color:#73809a; font-size:.88rem; }
+.exam-card { background:#fff; border:1px solid #e1e7f2; border-radius:16px; padding:17px 18px; min-height:150px; box-shadow:0 4px 14px rgba(24,42,76,.035); }
+.exam-card .exam-subject { color:#7a859b; font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; }
+.exam-card .exam-days { font-family:'Manrope',sans-serif; font-size:2rem; line-height:1.1; font-weight:800; color:#1c2d50; margin:10px 0 5px; }
+.exam-card .exam-date { color:#586984; font-size:.85rem; }
+.exam-card .exam-tag { display:inline-block; margin-top:12px; border-radius:99px; padding:4px 9px; background:#edf1ff; color:#4053bd; font-size:.72rem; font-weight:800; }
+.exam-card.urgent { border-color:#ffd8cf; background:#fffaf8; }
+.exam-card.urgent .exam-days { color:#bd4d37; }
+.exam-card.urgent .exam-tag { background:#fff0eb; color:#b94b35; }
+.progress-wrap { background:#fff; border:1px solid #e1e7f2; border-radius:15px; padding:16px 19px; margin:15px 0 5px; }
+.progress-title { font-weight:800; color:#1c2d50; }
+.progress-sub { color:#748099; font-size:.82rem; margin-top:4px; }
 .hero { background:linear-gradient(120deg,#eaf0ff 0%,#f5f7ff 100%); border:1px solid #dce5ff; border-radius:20px; padding:32px 34px; margin-bottom:24px; }
 .hero .eyebrow { color:#4055be; font-size:.72rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; }
 .hero h1 { font-size:2.15rem; line-height:1.17; margin:0; color:#172642 !important; }
@@ -126,9 +140,9 @@ if "generated" not in st.session_state:
 
 st.markdown("""
 <div class="hero">
-  <div class="eyebrow">STUDYPILOT · SMART STUDY PLANNING</div>
-  <h1>Your study plan, clear and under control.</h1>
-  <p>Prioritize exams and assignments with a practical timetable powered by Greedy Best-First Search, a heuristic search technique from your AISC syllabus.</p>
+  <div class="eyebrow">STUDYPILOT · YOUR EXAM SEASON COMMAND CENTRE</div>
+  <h1>Big goals. Small sessions. You've got this.</h1>
+  <p>Know exactly how many days are left, what deserves your attention, and what to study next. Your plan is prioritized using heuristic search from your AISC syllabus.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -146,6 +160,62 @@ m2.metric("Study hours left", f"{pending_hours:g} h")
 m3.metric("Completed tasks", completed_count)
 m4.metric("Next deadline", f"{days_to_exam} days" if days_to_exam is not None else "—",
           next_deadline.strftime("%d %b") if next_deadline else "No pending tasks")
+
+# Student-friendly progress and exam countdowns, grouped by subject.
+total_count = len(df)
+completion_pct = int(round((completed_count / total_count) * 100)) if total_count else 0
+st.markdown(f"""
+<div class="progress-wrap">
+  <div class="progress-title">Your semester progress <span style="float:right;color:#5264c9">{completion_pct}%</span></div>
+  <div class="progress-sub">{completed_count} of {total_count} study tasks completed. Every focused session moves you forward.</div>
+</div>
+""", unsafe_allow_html=True)
+st.progress(completion_pct / 100 if total_count else 0)
+
+exam_dates = {}
+for task in st.session_state.tasks:
+    exam_day = task.get("Exam date", today)
+    if isinstance(exam_day, str):
+        exam_day = pd.to_datetime(exam_day).date()
+    subject_name = str(task.get("Subject", "Subject"))
+    if subject_name not in exam_dates or exam_day < exam_dates[subject_name]:
+        exam_dates[subject_name] = exam_day
+upcoming_exams = sorted(
+    [(subject_name, exam_day, (exam_day - today).days)
+     for subject_name, exam_day in exam_dates.items()],
+    key=lambda item: item[1]
+)
+st.markdown("""
+<div class="section-heading">
+  <div>
+    <div class="section-eyebrow">Countdowns</div>
+    <h2 style="margin:0">Your exams, at a glance</h2>
+  </div>
+  <div class="section-caption">Stay ahead, one subject at a time</div>
+</div>
+""", unsafe_allow_html=True)
+if upcoming_exams:
+    exam_cols = st.columns(min(3, len(upcoming_exams)))
+    for idx, (subject_name, exam_day, days_left) in enumerate(upcoming_exams[:3]):
+        with exam_cols[idx]:
+            if days_left < 0:
+                big_text, tag, urgent = "Passed", "Check your next exam", False
+            elif days_left == 0:
+                big_text, tag, urgent = "Today!", "Final review mode", True
+            elif days_left == 1:
+                big_text, tag, urgent = "1 day", "Time to revise", True
+            else:
+                big_text, tag, urgent = f"{days_left} days", "You've got time — plan it", days_left <= 3
+            st.markdown(f"""
+            <div class="exam-card {'urgent' if urgent else ''}">
+              <div class="exam-subject">{subject_name}</div>
+              <div class="exam-days">{big_text}</div>
+              <div class="exam-date">{exam_day.strftime('%a, %d %b %Y')}</div>
+              <div class="exam-tag">{tag}</div>
+            </div>
+            """, unsafe_allow_html=True)
+else:
+    st.info("Add an exam date to see your countdown cards here.")
 
 with st.sidebar:
     st.markdown("## StudyPilot")
@@ -170,8 +240,8 @@ with st.sidebar:
 plan_tab, tasks_tab, algorithm_tab = st.tabs(["Study plan", "Manage tasks", "Algorithm"])
 
 with plan_tab:
-    st.markdown("## Your study schedule")
-    st.caption("Tasks with the highest heuristic priority are scheduled first.")
+    st.markdown("## Today's game plan")
+    st.caption("Small, focused sessions beat last-minute cramming. Your highest-priority task comes first.")
     controls = st.columns([1, 2])
     with controls[0]:
         if st.button("Generate study plan", type="primary", use_container_width=True):
