@@ -601,13 +601,13 @@ with algorithm_tab:
 """)
     st.markdown("### Search process")
     st.markdown("""
-1. Treat each pending task as a state.
-2. Calculate its heuristic score.
-3. Put tasks into a priority queue.
-4. Select the task with the highest score and repeat until all tasks are ranked.
-5. Place ranked tasks into daily sessions without exceeding the chosen daily study capacity.
+1. Treat each pending topic as a state and calculate its heuristic score.
+2. Prioritise topics using exam urgency, difficulty, importance, and remaining workload.
+3. Split long topics into focused sessions instead of filling a whole day with one topic.
+4. Rotate across subjects within each day when possible, while keeping approaching exams and difficult topics high priority.
+5. Respect the selected daily study capacity and schedule remaining work into later days.
 """)
-    st.info("Greedy Best-First Search is simple and explainable, but it does not guarantee a globally optimal timetable. Tasks are stored in session state in this demo, not a permanent database.")
+    st.info("Greedy Best-First Search is simple and explainable, but it does not guarantee a globally optimal timetable. The balancing and session-splitting rules are scheduling heuristics layered on top of the search ranking. Tasks are stored in session state in this demo, not a permanent database.")
 
 st.divider()
 st.caption("StudyPilot · Artificial Intelligence and Soft Computing · Heuristic Search course project")
