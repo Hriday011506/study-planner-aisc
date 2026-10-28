@@ -10,18 +10,34 @@ st.set_page_config(page_title="StudyPilot | Smart Study Planner", page_icon="�
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+:root { --ink:#17233b; --muted:#718096; --line:#e6eaf1; --accent:#4f5fc9; }
 html, body, [class*="css"] {font-family:'DM Sans',sans-serif;}
-.stApp {background:#f5f7fc;color:#17223b;}
-.block-container {padding-top:1.6rem;max-width:1250px;}
-.hero {background:linear-gradient(115deg,#17284c,#304e91 65%,#626bd8);padding:30px 34px;border-radius:22px;color:white;margin-bottom:22px;}
-.hero h1 {font-family:Manrope,sans-serif;color:white;font-size:2.35rem;font-weight:800;margin:0;letter-spacing:-1px;}
-.hero p {color:#e0e7ff;margin:9px 0 0;font-size:1rem;}
-.eyebrow {color:#bdccff;font-weight:700;text-transform:uppercase;letter-spacing:2px;font-size:.75rem;margin-bottom:10px;}
-.metric {background:white;border:1px solid #e5eaf4;border-radius:16px;padding:17px 19px;min-height:110px;box-shadow:0 4px 16px #1b2d5008;}
-.metric .label {font-size:.82rem;color:#7b8499;font-weight:600}.metric .value {font:800 1.8rem Manrope,sans-serif;color:#1b315e;margin-top:5px}.metric .note {font-size:.78rem;color:#8790a4;margin-top:3px;}
-.task {background:white;border:1px solid #e4eaf5;border-radius:14px;padding:14px;margin:0 0 10px;}
-.stButton>button {border-radius:10px;font-weight:700;}
-[data-testid="stSidebar"] {background:#eef2fa;}
+.stApp {background:#f7f8fb;color:var(--ink);}
+.block-container {max-width:1180px;padding:1.55rem 2rem 3rem;}
+h1,h2,h3 {font-family:'Manrope',sans-serif;letter-spacing:-.45px;color:#17233b;}
+[data-testid="stSidebar"] {background:#fff;border-right:1px solid var(--line);}
+[data-testid="stSidebar"] > div {padding-top:1.3rem;}
+[data-testid="stMetric"] {background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px 17px;box-shadow:none;}
+[data-testid="stMetricLabel"] {color:#778198;font-size:.82rem;}
+[data-testid="stMetricValue"] {color:#172b53;font-family:'Manrope',sans-serif;font-weight:800;}
+div[data-testid="stTabs"] button {font-weight:700;}
+.stButton>button,.stDownloadButton>button {border-radius:9px;font-weight:700;min-height:2.5rem;}
+.stButton>button[kind="primary"] {background:#4f5fc9;border-color:#4f5fc9;}
+.stButton>button[kind="primary"]:hover {background:#414fae;border-color:#414fae;}
+div[data-testid="stForm"] {background:white;border:1px solid var(--line);border-radius:13px;padding:18px;}
+div[data-testid="stDataFrame"],div[data-testid="stTable"] {border:1px solid var(--line);border-radius:9px;overflow:hidden;}
+hr {border-color:var(--line);}
+.hero {padding:8px 0 22px;border-bottom:1px solid var(--line);margin-bottom:22px;}
+.hero .eyebrow {font-size:.72rem;letter-spacing:1.6px;text-transform:uppercase;font-weight:800;color:var(--accent);margin-bottom:9px;}
+.hero h1 {font-family:'Manrope',sans-serif;font-size:2.2rem;line-height:1.12;margin:0;color:#17233b;font-weight:800;}
+.hero p {font-size:1rem;color:#68758c;margin:.65rem 0 0;max-width:710px;}
+.panel {background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 10px;}
+.panel-title {font-weight:800;color:#1e2d4b;font-size:.98rem;margin-bottom:4px;}
+.panel-sub {font-size:.83rem;color:#778198;}
+.score {display:inline-block;background:#eef0ff;color:#424fb3;border-radius:6px;padding:4px 7px;font-size:.75rem;font-weight:800;}
+.callout {border-left:3px solid #6472d3;background:#f0f2ff;padding:11px 13px;border-radius:0 8px 8px 0;color:#38456b;font-size:.9rem;}
+div[data-testid="stAlert"] {border-radius:9px;}
+footer {visibility:hidden;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -32,7 +48,7 @@ def demo_tasks(today):
     return [
         {"Subject":"Computer Networks","Task":"Subnetting practice","Exam date":today+timedelta(days=2),"Hours":2.0,"Difficulty":"Hard","Importance":"Critical","Status":"Pending","Notes":"Practice VLSM and CIDR"},
         {"Subject":"Artificial Intelligence","Task":"Heuristic search revision","Exam date":today+timedelta(days=3),"Hours":1.5,"Difficulty":"Moderate","Importance":"High","Status":"Pending","Notes":"A*, Best-First Search, hill climbing"},
-        {"Subject":"Predictive Analytics","Task":"Regression concepts","Exam date":today+timedelta(days=4),"Hours":2.0,"Difficulty":"Hard","Importance":"High","Status":"Pending","Notes":"Metrics and worked examples"},
+        {"Subject":"Artificial Intelligence","Task":"State-space problem practice","Exam date":today+timedelta(days=3),"Hours":1.0,"Difficulty":"Moderate","Importance":"High","Status":"Pending","Notes":"Trace states and solution paths"},
         {"Subject":"Software Engineering","Task":"UML diagrams","Exam date":today+timedelta(days=5),"Hours":1.5,"Difficulty":"Moderate","Importance":"Normal","Status":"Pending","Notes":"Use-case, activity, sequence"},
         {"Subject":"Computer Networks","Task":"TCP and congestion control","Exam date":today+timedelta(days=2),"Hours":1.0,"Difficulty":"Moderate","Importance":"High","Status":"Pending","Notes":"Slow start and AIMD"},
         {"Subject":"Cloud Computing","Task":"Service and deployment models","Exam date":today+timedelta(days=7),"Hours":1.5,"Difficulty":"Moderate","Importance":"Normal","Status":"Pending","Notes":"IaaS, PaaS, SaaS"},
@@ -98,9 +114,9 @@ if "generated" not in st.session_state:
 
 st.markdown("""
 <div class="hero">
-<div class="eyebrow">STUDYPILOT · YOUR PERSONAL STUDY COPILOT</div>
-<h1>Make every study hour count. ✨</h1>
-<p>A smart, explainable study planner that helps you choose what to study first — with heuristic search.</p>
+  <div class="eyebrow">STUDYPILOT / INTELLIGENT STUDY PLANNING</div>
+  <h1>Study smarter, one session at a time.</h1>
+  <p>Turn upcoming exams and assignments into a clear study schedule, guided by heuristic search from your AISC syllabus.</p>
 </div>""", unsafe_allow_html=True)
 
 df = frame_tasks(st.session_state.tasks)
@@ -121,12 +137,12 @@ with st.sidebar:
     st.caption("Plan with purpose. Learn with confidence.")
     st.divider()
     st.markdown("### Planning preferences")
-    hours_per_day = st.slider("Available study hours per day",1.0,10.0,4.0,0.5)
+    hours_per_day = st.slider("Study capacity per day",1.0,10.0,4.0,0.5)
     start_hour = st.selectbox("Preferred start time",list(range(6,21)),index=9,format_func=lambda h:datetime.strptime(str(h),"%H").strftime("%I:00 %p"))
-    horizon = st.slider("Show next how many days?",3,21,7)
+    horizon = st.slider("Schedule view",3,21,7)
     st.caption("Priority = urgency + difficulty + importance + workload.")
     st.divider()
-    if st.button("↻ Restore demo tasks",use_container_width=True):
+    if st.button("↻ Restore sample tasks",use_container_width=True):
         st.session_state.tasks = demo_tasks(date.today())
         st.session_state.generated = False
         st.rerun()
@@ -138,9 +154,9 @@ with st.sidebar:
 plan_tab, tasks_tab, ai_tab = st.tabs(["🗓️ Smart study plan","📚 Manage tasks","🧠 How the AI works"])
 with plan_tab:
     head, button = st.columns([1.6,1])
-    head.markdown("### Your upcoming study sessions")
+    head.markdown("### Your schedule")
     head.caption("Tasks are ranked by the heuristic score before being placed into daily study capacity.")
-    if button.button("✨ Generate smart plan",type="primary",use_container_width=True):
+    if button.button("✨ Generate plan",type="primary",use_container_width=True):
         st.session_state.generated = True
     if not st.session_state.generated:
         st.info("Demo tasks are loaded. Click **Generate smart plan** to create your first timetable.")
@@ -160,7 +176,7 @@ with plan_tab:
                         st.markdown(f"**{day.strftime('%a, %d %b')}**")
                         st.caption(f'{daily["Hours"].sum():g} study hours')
                         for _,item in daily.iterrows():
-                            st.markdown(f'<div class="task"><div style="font-size:.75rem;color:#7b849a;font-weight:700">{item["Start"]} – {item["End"]}</div><div style="font-weight:800;color:#1b315e;margin:6px 0">{item["Study task"]}</div><div style="font-size:.82rem;color:#68758e">{item["Subject"]}</div><div style="margin-top:8px;color:#5968c7;font-size:.78rem;font-weight:700">{item["Hours"]}h · {item["Importance"]} priority</div></div>',unsafe_allow_html=True)
+                            st.markdown(f'<div class="panel"><div style="font-size:.75rem;color:#7b849a;font-weight:700">{item["Start"]} – {item["End"]}</div><div class="panel-title" style="margin-top:6px">{item["Study task"]}</div><div class="panel-sub">{item["Subject"]}</div><div style="margin-top:9px"><span class="score">{item["Hours"]}h</span><span style="font-size:.75rem;color:#6e7890;margin-left:6px">{item["Importance"]} priority</span></div></div>',unsafe_allow_html=True)
             with st.expander("View complete timetable and priority scores"):
                 st.dataframe(sdf,use_container_width=True,hide_index=True)
             st.download_button("⬇️ Download timetable (CSV)",sdf.to_csv(index=False).encode("utf-8"),"studypilot_schedule.csv","text/csv")
@@ -173,7 +189,7 @@ with plan_tab:
             st.dataframe(pd.DataFrame(ranked)[["Subject","Task","Exam date","Difficulty","Importance","Hours","Priority score"]],use_container_width=True,hide_index=True)
 
 with tasks_tab:
-    st.markdown("### Add study tasks")
+    st.markdown("### Add a task")
     with st.form("add_task",clear_on_submit=True):
         a,b = st.columns(2)
         subject = a.text_input("Subject",placeholder="e.g. Artificial Intelligence")
@@ -202,7 +218,7 @@ with tasks_tab:
            "Difficulty":st.column_config.SelectboxColumn(options=list(DIFFICULTY)),
            "Importance":st.column_config.SelectboxColumn(options=list(IMPORTANCE)),
            "Status":st.column_config.SelectboxColumn(options=["Pending","Completed"])},key="editor")
-        if st.button("💾 Save task changes",type="primary"):
+        if st.button("💾 Save changes",type="primary"):
             editable["Exam date"] = pd.to_datetime(editable["Exam date"]).dt.date
             st.session_state.tasks = editable.fillna("").to_dict("records")
             st.session_state.generated = False
@@ -212,9 +228,9 @@ with tasks_tab:
         st.info("No tasks yet — add one above or restore the demo data in the sidebar.")
 
 with ai_tab:
-    st.markdown("### Under the hood: Greedy Best-First Search")
-    st.write("Each pending study task is treated as a state. The algorithm assigns a heuristic score and uses a priority queue to select the highest-scoring task first.")
-    st.latex(r"h(n) = \\frac{10}{d+1} + 1.4D + 1.8I + 0.25\\min(H,3)")
+    st.markdown("### Heuristic search, explained")
+    st.write("Each pending study task is represented as a state. The heuristic estimates how urgently the task should be considered, and a priority queue selects the highest-scoring task first.")
+    st.latex(r"h(n)=\frac{10}{d+1}+1.4D+1.8I+0.25\min(H,3)")
     st.markdown("""
 **Heuristic components**
 - **Urgency:** 10 divided by (days until deadline + 1). A nearer exam scores higher.
@@ -238,4 +254,4 @@ with ai_tab:
         st.dataframe(pd.DataFrame(ranked)[["Subject","Task","Days left","Difficulty","Importance","Priority score"]],use_container_width=True,hide_index=True)
 
 st.divider()
-st.markdown("<div style='text-align:center;color:#8791a6;font-size:.8rem'>StudyPilot · Intelligent Study Planning with Heuristic Search · Python + Streamlit</div>",unsafe_allow_html=True)
+st.markdown("<div style='text-align:center;color:#8791a6;font-size:.8rem'>StudyPilot · Artificial Intelligence and Soft Computing · Heuristic Search project</div>",unsafe_allow_html=True)
