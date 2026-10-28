@@ -146,28 +146,134 @@ def best_first_search(tasks, today):
     return ranked
 
 def make_schedule(tasks, today, hours_per_day, start_hour):
-    pending = [t for t in tasks if t.get("Status", "Pending") != "Completed"]
+    """
+    Build a balanced daily plan. Each study task can be split into shorter sessions,
+    urgent/difficult/important tasks score higher, and subjects rotate within a day.
+    """
+    pending = [dict(t) for t in tasks if t.get("Status", "Pending") != "Completed"]
     ranked = best_first_search(pending, today)
-    used, sessions = {}, []
-    for task in ranked:
-        remaining = float(task["Hours"])
-        while remaining > 0.001:
-            day = today
-            while used.get(day, 0) >= hours_per_day - 0.001:
-                day += timedelta(days=1)
-                if (day - today).days > 30:
-                    break
-            if (day - today).days > 30:
+    if not pending:
+        return [], ranked
+
+    remaining = {id(task): max(0.0, float(task.get("Hours", 0))) for task in pending}
+    ranked_by_id = {id(task): task for task in pending}
+    max_due = max(
+        max(0, ((task["Exam date"] if not isinstance(task["Exam date"], str)
+                 else pd.to_datetime(task["Exam date"]).date()) - today).days)
+        for task in pending
+    )
+    # Plan at least one week ahead, and extend beyond the latest exam when needed.
+    planning_days = min(60, max(7, max_due + 1))
+    sessions = []
+    session_length = min(1.25, max(0.5, float(hours_per_day) / 3))
+    subject_last_used = {}
+    for day_offset in range(planning_days):
+        day = today + timedelta(days=day_offset)
+        capacity_left = float(hours_per_day)
+        day_subjects = set()
+        day_task_ids = set()
+        while capacity_left >= 0.25:
+            candidates = []
+            for task in pending:
+                task_id = id(task)
+                hours_left = remaining.get(task_id, 0.0)
+                if hours_left < 0.01 or task_id in day_task_ids:
+                    continue
+                due_date = task["Exam date"]
+                if isinstance(due_date, str):
+                    due_date = pd.to_datetime(due_date).date()
+                days_left = (due_date - day).days
+                urgency = 14 / (max(0, days_left) + 1)
+                difficulty_score = DIFFICULTY.get(task.get("Difficulty", "Moderate"), 2) * 1.7
+                importance_score = IMPORTANCE.get(task.get("Importance", "Normal"), 2) * 2.0
+                # Increase priority if the remaining workload is becoming hard to fit before the exam.
+                days_available = max(1, days_left + 1)
+                pace_pressure = min(5.0, hours_left / days_available * 1.5)
+                score = urgency + difficulty_score + importance_score + pace_pressure
+                subject = str(task.get("Subject", "Other"))
+                # Prefer different subjects within a day; rotate back to a subject later.
+                if subject in day_subjects:
+                    score -= 7.0
+                last_day = subject_last_used.get(subject)
+                if last_day is not None and (day - last_day).days == 1 and subject not in day_subjects:
+                    score += 0.35
+                candidates.append((score, task, due_date))
+            if not candidates:
                 break
-            offset = used.get(day, 0)
-            duration = min(remaining, hours_per_day - offset)
-            start = datetime.combine(day, datetime.min.time()) + timedelta(hours=start_hour, minutes=int(offset * 60))
-            end = start + timedelta(hours=duration)
-            used[day] = offset + duration
-            sessions.append({"Date":day, "Day":day.strftime("%A"), "Start":start.strftime("%I:%M %p"),
-                "End":end.strftime("%I:%M %p"), "Subject":task["Subject"], "Study task":task["Task"],
-                "Hours":round(duration, 2), "Importance":task["Importance"], "Priority score":task["Priority score"]})
-            remaining -= duration
+            candidates.sort(key=lambda item: item[0], reverse=True)
+            score, task, due_date = candidates[0]
+            task_id = id(task)
+            subject = str(task.get("Subject", "Other"))
+            duration = min(session_length, capacity_left, remaining[task_id])
+            if duration < 0.01:
+                day_task_ids.add(task_id)
+                continue
+            start = datetime.combine(day, datetime.min.time()) + timedelta(
+                hours=start_hour, minutes=int((float(hours_per_day) - capacity_left) * 60)
+            )
+            finish = start + timedelta(hours=duration)
+            task_rank = next((r for r in ranked if r.get("Task") == task.get("Task")
+                              and r.get("Subject") == task.get("Subject")), {})
+            sessions.append({
+                "Date": day, "Day": day.strftime("%A"),
+                "Start": start.strftime("%I:%M %p"), "End": finish.strftime("%I:%M %p"),
+                "Subject": subject, "Study task": task.get("Task", "Study session"),
+                "Hours": round(duration, 2), "Importance": task.get("Importance", "Normal"),
+                "Priority score": round(score, 2), "Exam date": due_date
+            })
+            remaining[task_id] -= duration
+            capacity_left -= duration
+            day_subjects.add(subject)
+            day_task_ids.add(task_id)
+            subject_last_used[subject] = day
+
+        # Preserve unused capacity for future days; never force extra sessions just to fill the day.
+
+    # If workload remains after the planning window, place it into subsequent days in a balanced rotation.
+    day_offset = planning_days
+    while any(value >= 0.01 for value in remaining.values()) and day_offset < 90:
+        day = today + timedelta(days=day_offset)
+        capacity_left = float(hours_per_day)
+        day_subjects = set()
+        day_task_ids = set()
+        while capacity_left >= 0.25:
+            choices = []
+            for task in pending:
+                task_id = id(task)
+                if remaining.get(task_id, 0.0) < 0.01 or task_id in day_task_ids:
+                    continue
+                due_date = task["Exam date"]
+                if isinstance(due_date, str):
+                    due_date = pd.to_datetime(due_date).date()
+                days_left = (due_date - day).days
+                score = (14 / (max(0, days_left) + 1)
+                         + DIFFICULTY.get(task.get("Difficulty", "Moderate"), 2) * 1.7
+                         + IMPORTANCE.get(task.get("Importance", "Normal"), 2) * 2.0)
+                if task.get("Subject") in day_subjects:
+                    score -= 7
+                choices.append((score, task, due_date))
+            if not choices:
+                break
+            score, task, due_date = max(choices, key=lambda item: item[0])
+            task_id = id(task)
+            duration = min(session_length, capacity_left, remaining[task_id])
+            start = datetime.combine(day, datetime.min.time()) + timedelta(
+                hours=start_hour, minutes=int((float(hours_per_day) - capacity_left) * 60)
+            )
+            finish = start + timedelta(hours=duration)
+            sessions.append({
+                "Date": day, "Day": day.strftime("%A"),
+                "Start": start.strftime("%I:%M %p"), "End": finish.strftime("%I:%M %p"),
+                "Subject": str(task.get("Subject", "Other")), "Study task": task.get("Task", "Study session"),
+                "Hours": round(duration, 2), "Importance": task.get("Importance", "Normal"),
+                "Priority score": round(score, 2), "Exam date": due_date
+            })
+            remaining[task_id] -= duration
+            capacity_left -= duration
+            day_subjects.add(str(task.get("Subject", "Other")))
+            day_task_ids.add(task_id)
+            subject_last_used[str(task.get("Subject", "Other"))] = day
+        day_offset += 1
     return sessions, ranked
 
 def task_frame(tasks):
