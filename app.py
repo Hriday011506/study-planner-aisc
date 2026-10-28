@@ -466,7 +466,7 @@ if st.session_state.get("show_subject_plan_hint"):
 if st.session_state.get("active_progress_subject"):
     active_subject = st.session_state.active_progress_subject
     st.markdown(f"## {active_subject} — topic progress")
-    st.caption("Tick topics as completed or correct the exam date below. Changes are saved to your planner.")
+    st.caption("Set the exam date once for this subject. It will apply to every topic in the subject. Tick individual topics as you complete them.")
     active_tasks = [
         (i, item) for i, item in enumerate(st.session_state.tasks)
         if str(item.get("Subject", "")).strip().lower() == active_subject.strip().lower()
@@ -479,33 +479,43 @@ if st.session_state.get("active_progress_subject"):
     if not active_tasks:
         st.info("No topics added for this subject yet. Use **Build from handout** or **Manage tasks** to add topics.")
     else:
+        subject_dates = []
+        for _, item in active_tasks:
+            value = item.get("Exam date", today)
+            if isinstance(value, str):
+                value = pd.to_datetime(value).date()
+            subject_dates.append(value)
+        common_exam_date = subject_dates[0] if subject_dates else today
+        subject_exam_date = st.date_input(
+            "Exam date for this subject (applies to all its topics)",
+            value=common_exam_date,
+            key="subject_exam_date_" + re.sub(r"[^a-zA-Z0-9]+", "_", active_subject).strip("_")
+        )
+        if any(value != subject_exam_date for value in subject_dates):
+            if st.button("Apply exam date to all topics", type="primary", key="apply_subject_exam_date"):
+                for task_index, _ in active_tasks:
+                    st.session_state.tasks[task_index]["Exam date"] = subject_exam_date
+                save_tasks()
+                st.session_state.generated = False
+                st.rerun()
+        elif st.button("Save subject exam date", type="primary", key="save_subject_exam_date"):
+            for task_index, _ in active_tasks:
+                st.session_state.tasks[task_index]["Exam date"] = subject_exam_date
+            save_tasks()
+            st.session_state.generated = False
+            st.success("Exam date saved for all topics in this subject.")
+        st.markdown("### Topic checklist")
         for task_index, task_item in active_tasks:
-            left, middle, right = st.columns([3, 2, 1])
             current_done = task_item.get("Status", "Pending") == "Completed"
-            done = left.checkbox(
+            done = st.checkbox(
                 str(task_item.get("Task", "Study topic")),
                 value=current_done,
                 key=f"subject_progress_done_{task_index}",
                 help=f'{task_item.get("Hours", 0)} estimated study hours'
             )
-            exam_value = task_item.get("Exam date", today)
-            if isinstance(exam_value, str):
-                exam_value = pd.to_datetime(exam_value).date()
-            changed_date = middle.date_input(
-                "Exam date",
-                value=exam_value,
-                key=f"subject_progress_exam_{task_index}"
-            )
-            right.markdown("**Status**")
-            right.write("Completed" if done else "Pending")
-            changed = False
+            st.caption(f'{task_item.get("Hours", 0)} study hours · {"Completed" if done else "Pending"}')
             if done != current_done:
                 st.session_state.tasks[task_index]["Status"] = "Completed" if done else "Pending"
-                changed = True
-            if changed_date != exam_value:
-                st.session_state.tasks[task_index]["Exam date"] = changed_date
-                changed = True
-            if changed:
                 save_tasks()
                 st.session_state.generated = False
                 st.rerun()
