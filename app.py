@@ -13,37 +13,43 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 :root { color-scheme: light; }
 html, body, [class*="css"] { font-family:'DM Sans',sans-serif; }
-.stApp { background:#f5f7fb; color:#18243b; }
-.block-container { max-width:1180px; padding:1.5rem 2rem 3rem; }
-h1,h2,h3 { font-family:'Manrope',sans-serif !important; color:#18243b !important; letter-spacing:-.4px; }
-p, label, .stMarkdown, [data-testid="stWidgetLabel"] { color:#263550; }
-[data-testid="stSidebar"] { background:#ffffff; border-right:1px solid #e2e7f0; }
-[data-testid="stSidebar"] * { color:#263550; }
-[data-testid="stMetric"] { background:#ffffff; border:1px solid #e1e6f0; border-radius:14px; padding:16px; }
-[data-testid="stMetricLabel"] { color:#5c6880 !important; }
-[data-testid="stMetricValue"] { color:#182b50 !important; font-weight:800; }
-[data-testid="stTabs"] button { font-weight:700; color:#43516a; }
-[data-testid="stTabs"] button[aria-selected="true"] { color:#4053bd; }
-.stButton button, .stDownloadButton button, [data-testid="stFormSubmitButton"] button { border-radius:9px; font-weight:700; min-height:2.6rem; }
-.stButton button[kind="primary"], [data-testid="stFormSubmitButton"] button[kind="primary"] { background:#485bc4; border-color:#485bc4; color:#ffffff; }
-div[data-testid="stForm"] { background:#ffffff; border:1px solid #e1e6f0; border-radius:14px; padding:18px; }
-div[data-testid="stDataFrame"] { background:#ffffff; border:1px solid #e1e6f0; border-radius:10px; }
-hr { border-color:#e1e6f0; }
-.hero { background:#eaf0ff; border:1px solid #d8e2ff; border-radius:18px; padding:26px 28px; margin-bottom:22px; }
-.hero .eyebrow { color:#4053bd; font-size:.72rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
-.hero h1 { font-size:2rem; line-height:1.18; margin:0; color:#172747 !important; }
-.hero p { color:#40506c; font-size:.98rem; margin:.65rem 0 0; max-width:760px; line-height:1.55; }
-.task-card { background:#ffffff; border:1px solid #e1e6f0; border-radius:12px; padding:14px 16px; margin-bottom:10px; }
-.task-time { color:#52617a; font-size:.82rem; font-weight:700; }
-.task-title { color:#182b50; font-size:1rem; font-weight:800; margin:5px 0; }
-.task-meta { color:#52617a; font-size:.86rem; }
-.small-label { color:#68758e; font-size:.75rem; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; }
-div[data-testid="stAlert"] { border-radius:10px; }
-@media (max-width: 800px) {
- .block-container { padding:1rem .8rem 2rem; }
- .hero { padding:20px; }
- .hero h1 { font-size:1.55rem; }
-}
+.stApp { background:#f6f8fc; color:#18243b; }
+.block-container { max-width:1240px; padding:1.7rem 2.2rem 3rem; }
+h1,h2,h3,h4 { font-family:'Manrope',sans-serif !important; color:#172642 !important; letter-spacing:-.35px; }
+p, label, .stMarkdown, [data-testid="stWidgetLabel"] { color:#34435d; }
+[data-testid="stSidebar"] { background:#fff; border-right:1px solid #e4e9f2; }
+[data-testid="stSidebar"] * { color:#24344f; }
+[data-testid="stMetric"] { background:#fff; border:1px solid #e2e8f2; border-radius:15px; padding:17px 18px; box-shadow:0 4px 14px rgba(24,42,76,.035); }
+[data-testid="stMetricLabel"] { color:#64718a !important; font-size:.84rem; }
+[data-testid="stMetricValue"] { color:#172b4d !important; font-weight:800; }
+[data-testid="stMetricDelta"] { color:#227653 !important; }
+[data-baseweb="select"] > div { background:#fff !important; color:#1d2b45 !important; border-color:#d9e0ec !important; border-radius:9px !important; }
+[data-baseweb="select"] input, [data-baseweb="select"] span { color:#1d2b45 !important; }
+[data-baseweb="popover"], [data-baseweb="menu"], [role="listbox"] { background:#fff !important; color:#1d2b45 !important; }
+[role="option"] { color:#1d2b45 !important; }
+input, textarea { background:#fff !important; color:#1d2b45 !important; border-color:#d9e0ec !important; }
+[data-testid="stNumberInput"] button { background:#f1f4fa !important; color:#1d2b45 !important; border-color:#d9e0ec !important; }
+[data-testid="stTabs"] { margin-top:1.4rem; }
+[data-testid="stTabs"] button { font-weight:700; color:#52617a !important; padding: .75rem 1rem; }
+[data-testid="stTabs"] button[aria-selected="true"] { color:#4055be !important; }
+.stButton button, .stDownloadButton button, [data-testid="stFormSubmitButton"] button { border-radius:10px; font-weight:700; min-height:2.65rem; }
+.stButton button:not([kind="primary"]), .stDownloadButton button { background:#fff !important; color:#253650 !important; border:1px solid #d9e1ee !important; }
+.stButton button:not([kind="primary"]):hover, .stDownloadButton button:hover { background:#f1f4fb !important; border-color:#aab7d3 !important; }
+.stButton button[kind="primary"], [data-testid="stFormSubmitButton"] button[kind="primary"] { background:#485bc4 !important; border:1px solid #485bc4 !important; color:#fff !important; }
+.stButton button[kind="primary"]:hover, [data-testid="stFormSubmitButton"] button[kind="primary"]:hover { background:#394ba9 !important; color:#fff !important; }
+div[data-testid="stForm"] { background:#fff; border:1px solid #e2e8f2; border-radius:15px; padding:20px; }
+div[data-testid="stDataFrame"] { background:#fff; border:1px solid #e2e8f2; border-radius:11px; }
+hr { border-color:#e2e8f2; }
+.hero { background:linear-gradient(120deg,#eaf0ff 0%,#f5f7ff 100%); border:1px solid #dce5ff; border-radius:20px; padding:32px 34px; margin-bottom:24px; }
+.hero .eyebrow { color:#4055be; font-size:.72rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; }
+.hero h1 { font-size:2.15rem; line-height:1.17; margin:0; color:#172642 !important; }
+.hero p { color:#465773; font-size:1rem; margin:.8rem 0 0; max-width:780px; line-height:1.65; }
+.task-card { background:#fff; border:1px solid #e2e8f2; border-radius:13px; padding:16px 18px; margin-bottom:11px; box-shadow:0 3px 10px rgba(24,42,76,.025); }
+.task-time { color:#65728a; font-size:.82rem; font-weight:700; }
+.task-title { color:#172b4d; font-size:1.02rem; font-weight:800; margin:6px 0; }
+.task-meta { color:#596983; font-size:.88rem; }
+div[data-testid="stAlert"] { border-radius:11px; }
+@media (max-width:800px) { .block-container { padding:1rem .8rem 2rem; } .hero { padding:22px; } .hero h1 { font-size:1.6rem; } }
 </style>
 """, unsafe_allow_html=True)
 
