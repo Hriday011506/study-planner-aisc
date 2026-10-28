@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta
 import pandas as pd
 import streamlit as st
 
-st.set_page_config(page_title="StudyPilot", page_icon="S", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="StudyPilot", page_icon="assets/studypilot-logo.svg", layout="wide", initial_sidebar_state="expanded")
 
 # Use Streamlit-native components for reliable contrast and responsive rendering.
 st.markdown("""
@@ -304,8 +304,8 @@ if st.session_state.get("show_subject_plan_hint"):
     st.info("Selected: " + st.session_state.get("chosen_dashboard_subject", "") + ". Open **Build from handout** to upload its course handout and generate a topic-based plan.")
 
 with st.sidebar:
-    st.markdown("## StudyPilot")
-    st.caption("A focused workspace for exam preparation.")
+    st.image("assets/studypilot-logo.svg", use_container_width=True)
+    st.caption("Your personal exam-prep workspace.")
     st.divider()
     st.markdown("### Schedule settings")
     hours_per_day = st.slider("Daily study capacity", 1.0, 10.0, 4.0, 0.5)
