@@ -433,7 +433,7 @@ plan_tab, tasks_tab, syllabus_tab, algorithm_tab = st.tabs(["Study plan", "Manag
 
 with plan_tab:
     st.markdown("## Today's game plan")
-    st.caption("Small, focused sessions beat last-minute cramming. Your highest-priority task comes first.")
+    st.caption("A balanced mix of subjects each day, prioritised by exam date, difficulty, importance, and remaining workload.")
     controls = st.columns([1, 2])
     with controls[0]:
         if st.button("Generate study plan", type="primary", use_container_width=True):
