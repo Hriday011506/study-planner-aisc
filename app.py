@@ -1,5 +1,7 @@
 import heapq
 import itertools
+import io
+import re
 from datetime import date, datetime, timedelta
 
 import pandas as pd
@@ -70,6 +72,48 @@ div[data-testid="stAlert"] { border-radius:11px; }
 IMPORTANCE = {"Low": 1, "Normal": 2, "High": 3, "Critical": 4}
 DIFFICULTY = {"Easy": 1, "Moderate": 2, "Hard": 3, "Very hard": 4}
 
+def extract_topics(uploaded_file):
+    """Extract likely syllabus topics from PDF, DOCX, or plain-text handouts."""
+    filename = uploaded_file.name.lower()
+    raw = uploaded_file.getvalue()
+    text = ""
+    if filename.endswith(".pdf"):
+        from pypdf import PdfReader
+        reader = PdfReader(io.BytesIO(raw))
+        text = "\n".join(page.extract_text() or "" for page in reader.pages)
+    elif filename.endswith(".docx"):
+        from docx import Document
+        doc = Document(io.BytesIO(raw))
+        parts = [p.text for p in doc.paragraphs if p.text.strip()]
+        for table in doc.tables:
+            for row in table.rows:
+                parts.append(" | ".join(cell.text.strip() for cell in row.cells if cell.text.strip()))
+        text = "\n".join(parts)
+    else:
+        text = raw.decode("utf-8", errors="ignore")
+    lines = [re.sub(r"\\s+", " ", line).strip(" •\t-–—") for line in text.splitlines()]
+    lines = [line for line in lines if len(line) >= 3]
+    topics = []
+    seen = set()
+    heading_pattern = re.compile(r"^(?:(?:unit|module|chapter|lecture|week|topic|experiment)\\s*(?:[0-9ivx]+)?\\s*[:.\\-–)]?\\s*|(?:[0-9]+(?:\\.[0-9]+)*[.)]?\\s+))(.+)$", re.I)
+    generic_labels = {"contents", "table of contents", "course outcomes", "references", "text books", "textbooks", "assessment", "evaluation", "syllabus"}
+    for line in lines:
+        clean = re.sub(r"\\s+", " ", line).strip()
+        match = heading_pattern.match(clean)
+        candidate = match.group(1).strip(" :.-") if match else clean
+        if candidate.lower() in generic_labels:
+            continue
+        is_bullet = line != clean or re.match(r"^[•*▪◦-]\\s+", line) is not None
+        is_heading = match is not None or (len(clean) <= 90 and clean.isupper() and len(clean.split()) <= 12)
+        looks_like_topic = any(word in candidate.lower() for word in ["search", "algorithm", "learning", "network", "logic", "agent", "model", "cloud", "knowledge", "game", "neural", "fuzzy", "genetic", "planning", "optimization", "optimization", "module", "unit", "introduction", "architecture", "classification", "regression", "analysis", "management", "security", "computing", "programming", "data", "system", "design", "testing", "heuristic", "hill climbing", "best-first", "a*"])
+        if (is_bullet or is_heading or looks_like_topic) and 3 <= len(candidate) <= 120:
+            key = candidate.lower()
+            if key not in seen and not re.match(r"^(page|figure|table)\\s+\\d+", key):
+                seen.add(key)
+                topics.append(candidate)
+    # Keep the list useful and avoid turning whole paragraphs into topics.
+    topics = [t for t in topics if len(t.split()) <= 18]
+    return text, topics[:100]
 def demo_tasks(today):
     return [
         {"Subject":"Artificial Intelligence","Task":"Heuristic search revision","Exam date":today+timedelta(days=3),"Hours":1.5,"Difficulty":"Moderate","Importance":"High","Status":"Pending","Notes":"Best-First Search, Hill Climbing, A*"},
@@ -237,7 +281,7 @@ with st.sidebar:
         st.rerun()
     st.caption("Demo data is included so you can present the project immediately.")
 
-plan_tab, tasks_tab, algorithm_tab = st.tabs(["Study plan", "Manage tasks", "Algorithm"])
+plan_tab, tasks_tab, syllabus_tab, algorithm_tab = st.tabs(["Study plan", "Manage tasks", "Build from handout", "Algorithm"])
 
 with plan_tab:
     st.markdown("## Today's game plan")
@@ -327,6 +371,70 @@ with tasks_tab:
     else:
         st.info("No tasks yet. Add one above or restore the demo tasks in the sidebar.")
 
+with syllabus_tab:
+    st.markdown("## Build a study plan from your course handout")
+    st.caption("Choose a subject and upload the syllabus. StudyPilot extracts topics for you to review before adding them to your plan.")
+    with st.form("handout_setup"):
+        subject_choice = st.text_input("Subject name", placeholder="e.g. Artificial Intelligence and Soft Computing")
+        handout = st.file_uploader("Upload course handout", type=["pdf", "docx", "txt"], help="PDF, Word document (.docx), or plain text.")
+        exam_day = st.date_input("Exam date", value=today + timedelta(days=7), key="handout_exam_day")
+        default_hours = st.number_input("Estimated hours per topic", min_value=0.25, max_value=8.0, value=1.0, step=0.25)
+        parse_handout = st.form_submit_button("Extract topics", type="primary")
+    if parse_handout:
+        if not subject_choice.strip():
+            st.error("Enter the subject name first.")
+        elif handout is None:
+            st.error("Upload a course handout to extract topics.")
+        else:
+            try:
+                extracted_text, extracted_topics = extract_topics(handout)
+                st.session_state.handout_subject = subject_choice.strip()
+                st.session_state.handout_exam_day = exam_day
+                st.session_state.handout_hours = float(default_hours)
+                st.session_state.extracted_topics = extracted_topics
+                st.session_state.handout_filename = handout.name
+                st.session_state.handout_text_preview = extracted_text[:12000]
+                st.session_state.selected_topics = extracted_topics[:]
+                if not extracted_topics:
+                    st.warning("The file text was read, but no clear topic headings were detected. Try a text-based PDF or DOCX, or review the extracted text below.")
+                else:
+                    st.success("Extracted " + str(len(extracted_topics)) + " possible topics from " + handout.name + ". Review the list before adding it to your plan.")
+            except Exception as exc:
+                st.error("Could not read this file: " + str(exc))
+    if st.session_state.get("extracted_topics"):
+        st.markdown("### Review the extracted topics")
+        st.caption("The extraction is based on headings, numbered items, and bullet points. Check the topics before adding them.")
+        selected = st.multiselect("Topics to include", options=st.session_state.extracted_topics,
+                                  default=st.session_state.get("selected_topics", st.session_state.extracted_topics),
+                                  key="topics_multiselect")
+        topic_cols = st.columns(3)
+        with topic_cols[0]:
+            per_topic_hours = st.number_input("Hours per selected topic", min_value=0.25, max_value=8.0,
+                                              value=float(st.session_state.get("handout_hours", 1.0)), step=0.25, key="topic_hours")
+        with topic_cols[1]:
+            topic_importance = st.selectbox("Default importance", list(IMPORTANCE), index=2, key="topic_importance")
+        with topic_cols[2]:
+            topic_difficulty = st.selectbox("Default difficulty", list(DIFFICULTY), index=1, key="topic_difficulty")
+        st.info("Selected " + str(len(selected)) + " topics · estimated workload " + str(round(len(selected) * per_topic_hours, 2)) + " hours")
+        if st.button("Add selected topics to my study plan", type="primary", use_container_width=True):
+            existing = {(str(t.get("Subject", "")).lower(), str(t.get("Task", "")).lower()) for t in st.session_state.tasks}
+            added = 0
+            for topic in selected:
+                key = (st.session_state.handout_subject.lower(), topic.lower())
+                if key in existing:
+                    continue
+                st.session_state.tasks.append({"Subject":st.session_state.handout_subject, "Task":topic,
+                    "Exam date":st.session_state.handout_exam_day, "Hours":float(per_topic_hours),
+                    "Difficulty":topic_difficulty, "Importance":topic_importance, "Status":"Pending",
+                    "Notes":"Extracted from " + st.session_state.get("handout_filename", "course handout")})
+                existing.add(key)
+                added += 1
+            st.session_state.generated = False
+            st.success("Added " + str(added) + " topic tasks to your planner. Open Study plan and generate your schedule.")
+    elif st.session_state.get("handout_text_preview"):
+        with st.expander("Preview extracted text"):
+            st.text(st.session_state.handout_text_preview)
+    st.caption("Tip: scanned PDFs that contain only images may not have selectable text. OCR is not included in this version.")
 with algorithm_tab:
     st.markdown("## How the algorithm works")
     st.write("This project uses Greedy Best-First Search, a heuristic search technique listed in the AISC syllabus. Each pending study task receives a score, and the task with the highest score is selected first.")
