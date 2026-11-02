@@ -41,6 +41,22 @@ input, textarea { background:#fff !important; color:#1d2b45 !important; border-c
 .stButton button:not([kind="primary"]):hover, .stDownloadButton button:hover { background:#f1f4fb !important; border-color:#aab7d3 !important; }
 .stButton button[kind="primary"], [data-testid="stFormSubmitButton"] button[kind="primary"] { background:#485bc4 !important; border:1px solid #485bc4 !important; color:#fff !important; }
 .stButton button[kind="primary"]:hover, [data-testid="stFormSubmitButton"] button[kind="primary"]:hover { background:#394ba9 !important; color:#fff !important; }
+/* Keep primary button labels readable across Streamlit versions and nested text elements. */
+.stButton button[kind="primary"],
+.stButton button[kind="primary"] *,
+[data-testid="stBaseButton-primary"],
+[data-testid="stBaseButton-primary"] *,
+[data-testid="stFormSubmitButton"] button,
+[data-testid="stFormSubmitButton"] button * {
+    color:#ffffff !important;
+    -webkit-text-fill-color:#ffffff !important;
+    opacity:1 !important;
+}
+.stButton button[kind="primary"]:hover *,
+[data-testid="stBaseButton-primary"]:hover * {
+    color:#ffffff !important;
+    -webkit-text-fill-color:#ffffff !important;
+}
 div[data-testid="stForm"] { background:#fff; border:1px solid #e2e8f2; border-radius:15px; padding:20px; }
 div[data-testid="stDataFrame"] { background:#fff; border:1px solid #e2e8f2; border-radius:11px; }
 hr { border-color:#e2e8f2; }
