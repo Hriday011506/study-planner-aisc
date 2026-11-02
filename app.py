@@ -647,7 +647,7 @@ if st.session_state.get("show_topic_schedule", False):
         else:
             st.warning("No pending study sessions could be generated. Check that your topics have valid exam dates and estimated study hours.")
 
-plan_tab, tasks_tab, syllabus_tab, algorithm_tab = st.tabs(["Study plan", "Manage tasks", "Build from handout", "Algorithm"])
+plan_tab, tasks_tab, syllabus_tab, algorithm_tab, ai_concepts_tab = st.tabs(["Study plan", "Manage tasks", "Build from handout", "Algorithm", "AI Concepts"])
 
 with plan_tab:
     st.markdown("## Your complete study plan")
@@ -848,7 +848,7 @@ with syllabus_tab:
         with st.expander("Preview extracted text"):
             st.text(st.session_state.handout_text_preview)
     st.caption("Tip: scanned PDFs that contain only images may not have selectable text. OCR is not included in this version.")
-with algorithm_tab:
+with ai_concepts_tab:
     st.markdown("## AI concepts used in StudyPilot")
     st.caption("A quick technical overview of the Artificial Intelligence and Soft Computing concepts implemented in this project.")
 
@@ -879,6 +879,8 @@ with algorithm_tab:
     st.info("The main AI search method is Greedy Best-First Search. The timetable balancing and session-splitting rules are additional scheduling heuristics; they are not separate machine-learning models.")
 
     st.divider()
+
+with algorithm_tab:
     st.markdown("## How the algorithm works")
     st.write("This project uses Greedy Best-First Search, a heuristic search technique listed in the AISC syllabus. Each pending study task receives a score, and the task with the highest score is selected first.")
     st.latex(r"h(n)=\frac{10}{d+1}+1.4D+1.8I+0.25\min(H,3)")
