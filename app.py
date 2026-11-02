@@ -849,6 +849,36 @@ with syllabus_tab:
             st.text(st.session_state.handout_text_preview)
     st.caption("Tip: scanned PDFs that contain only images may not have selectable text. OCR is not included in this version.")
 with algorithm_tab:
+    st.markdown("## AI concepts used in StudyPilot")
+    st.caption("A quick technical overview of the Artificial Intelligence and Soft Computing concepts implemented in this project.")
+
+    concept_cols = st.columns(3)
+    with concept_cols[0]:
+        st.markdown("### 1. Heuristic Search")
+        st.write("The planner evaluates each pending topic using a heuristic score based on exam urgency, difficulty, importance and estimated workload.")
+        st.caption("Purpose: estimate which topic deserves attention first.")
+    with concept_cols[1]:
+        st.markdown("### 2. Greedy Best-First Search")
+        st.write("The planner repeatedly selects the pending topic with the highest heuristic score. This is the main search strategy used by StudyPilot.")
+        st.caption("Implementation: Python priority queue using heapq.")
+    with concept_cols[2]:
+        st.markdown("### 3. Scheduling Heuristics")
+        st.write("After prioritisation, additional scheduling rules split work into focused sessions, respect daily capacity and encourage subject rotation.")
+        st.caption("Purpose: turn topic priorities into a practical timetable.")
+
+    st.markdown("### Other programming and AI concepts")
+    st.markdown("""
+| Concept | Where it appears in StudyPilot |
+|---|---|
+| State/task representation | Each pending study topic is represented as a task with a subject, exam date, hours, difficulty, importance and status. |
+| Priority queue | heapq helps retrieve the task with the highest priority score. |
+| Heuristic evaluation | A scoring function estimates topic priority from the task attributes. |
+| Constraint-aware scheduling | Daily study capacity and session duration limit how much work is placed in a day. |
+| Dynamic replanning | When task details or completion status change, the schedule can be generated again using the remaining pending topics. |
+""")
+    st.info("The main AI search method is Greedy Best-First Search. The timetable balancing and session-splitting rules are additional scheduling heuristics; they are not separate machine-learning models.")
+
+    st.divider()
     st.markdown("## How the algorithm works")
     st.write("This project uses Greedy Best-First Search, a heuristic search technique listed in the AISC syllabus. Each pending study task receives a score, and the task with the highest score is selected first.")
     st.latex(r"h(n)=\frac{10}{d+1}+1.4D+1.8I+0.25\min(H,3)")
