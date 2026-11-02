@@ -82,6 +82,11 @@ hr { border-color:#e2e8f2; }
 .task-time { color:#65728a; font-size:.82rem; font-weight:700; }
 .task-title { color:#172b4d; font-size:1.02rem; font-weight:800; margin:6px 0; }
 .task-meta { color:#596983; font-size:.88rem; }
+.urgency-pill { display:inline-block; padding:4px 10px; border-radius:999px; font-size:.74rem; font-weight:800; margin:3px 0 7px; }
+.urgency-red { color:#a52b25; background:#ffe5e2; border:1px solid #ffc7c1; }
+.urgency-yellow { color:#875b00; background:#fff2c9; border:1px solid #ffe29a; }
+.urgency-green { color:#176b43; background:#def5e7; border:1px solid #b8e8ca; }
+.urgency-legend { display:flex; flex-wrap:wrap; gap:9px; margin:8px 0 14px; }
 div[data-testid="stAlert"] { border-radius:11px; }
 @media (max-width:800px) { .block-container { padding:1rem .8rem 2rem; } .hero { padding:22px; } .hero h1 { font-size:1.6rem; } }
 </style>
@@ -567,6 +572,13 @@ with st.sidebar:
 if st.session_state.get("show_topic_schedule", False):
     st.markdown("## Your topic-wise study schedule")
     st.caption("Follow this combined timetable in date and time order. Completed topics are shown separately and are not scheduled again.")
+    st.markdown("""
+    <div class="urgency-legend">
+      <span class="urgency-pill urgency-red">Red · 3 days or less</span>
+      <span class="urgency-pill urgency-yellow">Yellow · 4–7 days</span>
+      <span class="urgency-pill urgency-green">Green · More than 7 days</span>
+    </div>
+    """, unsafe_allow_html=True)
     schedule_sessions, _ = make_schedule(st.session_state.tasks, today, hours_per_day, start_hour)
     if schedule_sessions:
         topic_schedule_df = pd.DataFrame(schedule_sessions)
@@ -601,6 +613,11 @@ if st.session_state.get("show_topic_schedule", False):
                     st.session_state[subject_widget_key] = new_status
                     save_tasks()
                     st.session_state.generated = False
+                exam_day = pd.to_datetime(planned_topic["Exam date"]).date()
+                days_left = (exam_day - today).days
+                urgency_class = "urgency-red" if days_left <= 3 else ("urgency-yellow" if days_left <= 7 else "urgency-green")
+                urgency_label = "Due very soon" if days_left <= 3 else ("Coming up" if days_left <= 7 else "Plenty of time")
+                st.markdown(f'<span class="urgency-pill {urgency_class}">{urgency_label} · {max(0, days_left)} days left</span>', unsafe_allow_html=True)
                 done = st.checkbox(
                     f'{planned_topic["Start"]}–{planned_topic["End"]} · {planned_topic["Study task"]}',
                     key=schedule_key,
@@ -667,8 +684,13 @@ with plan_tab:
                 st.markdown(f"### {session_day.strftime('%A, %d %B')}")
                 st.caption(f"{day_items['Hours'].sum():g} hours planned")
                 for _, item in day_items.iterrows():
+                    exam_day = pd.to_datetime(item["Exam date"]).date()
+                    days_left = (exam_day - today).days
+                    urgency_class = "urgency-red" if days_left <= 3 else ("urgency-yellow" if days_left <= 7 else "urgency-green")
+                    urgency_label = "Due very soon" if days_left <= 3 else ("Coming up" if days_left <= 7 else "Plenty of time")
                     st.markdown(f"""
                     <div class="task-card">
+                      <span class="urgency-pill {urgency_class}">{urgency_label} · {max(0, days_left)} days left</span>
                       <div class="task-time">{item["Start"]} – {item["End"]} &nbsp; · &nbsp; {item["Hours"]:g} hours</div>
                       <div class="task-title">{item["Study task"]}</div>
                       <div class="task-meta">{item["Subject"]} &nbsp; · &nbsp; {item["Importance"]} priority</div>
