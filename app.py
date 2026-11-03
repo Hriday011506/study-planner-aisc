@@ -899,6 +899,18 @@ with algorithm_tab:
 4. Rotate across subjects within each day when possible, while keeping approaching exams and difficult topics high priority.
 5. Respect the selected daily study capacity and schedule remaining work into later days.
 """)
+    st.markdown("### Time and space complexity")
+    st.markdown("""
+| Part | Complexity | Explanation |
+|---|---:|---|
+| Heuristic calculation | \\(O(1)\\) per topic | Uses a fixed number of arithmetic operations. |
+| Greedy Best-First Search | \\(O(n\\log n)\\) | Inserts and removes all \(n\) topics using a priority queue. |
+| Complete timetable generation | \\(O(Dn^2)\\) | For each planning day, the scheduler can repeatedly scan the pending topics to choose sessions. |
+| GBFS auxiliary space | \\(O(n)\\) | Stores the frontier and ranked topics. |
+| Complete schedule space | \\(O(Dn)\\) | Stores the generated study sessions in the worst case. |
+""")
+    st.markdown("**Overall time complexity: \\(O(Dn^2)\\)**")
+    st.caption("Here, n is the number of pending topics and D is the number of planning days. In this implementation, the planning window is capped, so D is bounded. The GBFS ranking alone is O(n log n); the higher overall bound comes from timetable generation.")
     st.info("Greedy Best-First Search is simple and explainable, but it does not guarantee a globally optimal timetable. The balancing and session-splitting rules are scheduling heuristics layered on top of the search ranking. Tasks are stored in session state in this demo, not a permanent database.")
 
 st.divider()
